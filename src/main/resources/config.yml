@@ -1,0 +1,9 @@
+databaseUri: 'jdbc:h2:./plugins/Aurora/aurora'
+initialClaims: 4  # 1 claim = 256 * 384 blocks^3 (one chunk)
+claimCreationTool: 'GOLDEN_SHOVEL'
+claimInvestigationTool: 'STICK'
+messages:
+  tooFarAway: "§cThat's too far away!"
+  notAClaim:  "§cThere is no claim here."
+  alreadyClaimed: "§cThere is already a claim here."
+  blockClaimedBy: "§cThis block is claimed by %s."

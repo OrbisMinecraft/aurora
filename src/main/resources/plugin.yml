@@ -1,0 +1,20 @@
+name: Aurora
+version: '${version}'
+main: de.lmichaelis.aurora.Aurora
+api-version: 1.18
+prefix: Aurora
+commands:
+  aurora:
+    description: 'Base command to interact with the Aurora claims plugin.'
+    usage: '§cUsage: /<command> <reload|listclaims>'
+    permission-message: "§cYou don't have permission to execute this command."
+    aliases:
+      - 'a'
+permissions:
+  aurora.reload:
+    description: "Permission required to reload the plugin's configuration (/aurora reload)"
+    default: op
+  aurora.claims:
+    description: "Permission required to create and delete your own claims."
+  aurora.claims.other:
+    description: "Permission required to list and delete other's claims."
