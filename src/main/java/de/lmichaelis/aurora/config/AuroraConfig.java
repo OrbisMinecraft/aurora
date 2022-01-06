@@ -16,7 +16,7 @@ import java.util.HashMap;
 
 public final class AuroraConfig {
 	public String databaseUri = "jdbc:h2:mem:";
-	public int initialClaims = 1;
+	public int initialClaimBlocks = 1000;
 	public Material claimCreationTool = Material.GOLDEN_SHOVEL;
 	public Material claimInvestigationTool = Material.STICK;
 	public MessagesConfig messages = new MessagesConfig();

@@ -5,6 +5,7 @@ package de.lmichaelis.aurora.model;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import de.lmichaelis.aurora.Aurora;
+import de.lmichaelis.aurora.AuroraUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -68,8 +69,6 @@ public final class User {
 	}
 
 	public static @Nullable User fromMetadata(final @NotNull Player player) {
-		final var matching = player.getMetadata(METADATA_KEY);
-		if (matching.isEmpty()) return null;
-		return (User) matching.get(0).value();
+		return AuroraUtil.getScalarMetadata(METADATA_KEY, player);
 	}
 }
