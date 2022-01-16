@@ -13,10 +13,25 @@ resources:
   source:
     repository: lmichaelis/aurora
     access_token: ((github-token))
+- name: repository
+  type: git
+  icon: git
+  check_every: 24h
+  webhook_token: ((repository-hook))
+  source:
+    uri: https://github.com/lmichaelis/aurora.git
+    branch: main
+- name: image
+  type: registry-image
+  icon: docker
+  source:
+    repository: gradle
+    tag: jdk17
 
 jobs:
-- name: test
+- name: test-pr
   plan:
+    - get: image
     - get: pull-request
       trigger: true
       version: every
@@ -25,12 +40,9 @@ jobs:
         path: pull-request
         status: pending
     - task: test
+      image: image
       config:
         platform: linux
-        image_resource:
-          type: registry-image
-          source: 
-            repository: gradle
         inputs:
           - name: pull-request
         run:
@@ -50,3 +62,23 @@ jobs:
       params:
         path: pull-request
         status: success
+- name: build-main
+  plan:
+    - get: image
+    - get: repository
+      trigger: true
+    - task: test
+      image: image
+      config:
+        platform: linux
+        inputs:
+          - name: repository
+        run:
+          path: /usr/bin/gradle
+          dir: repository
+          args:
+            - '--no-watch-fs'
+            - '--no-daemon'
+            - '--continue'
+            - test
+# todo: actually build and then save the result somewhere, updating the github commit info
