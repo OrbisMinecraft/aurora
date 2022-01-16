@@ -1,0 +1,52 @@
+resource_types:
+- name: pull-request
+  type: registry-image
+  source:
+    repository: teliaoss/github-pr-resource
+
+resources:
+- name: pull-request
+  type: pull-request
+  icon: github
+  check_every: 24h
+  webhook_token: ((repository-hook))
+  source:
+    repository: lmichaelis/aurora
+    access_token: ((github-token))
+
+jobs:
+- name: test
+  plan:
+    - get: pull-request
+      trigger: true
+      version: every
+    - put: pull-request
+      params:
+        path: pull-request
+        status: pending
+    - task: test
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source: 
+            repository: gradle
+        inputs:
+          - name: pull-request
+        run:
+          path: /usr/bin/gradle
+          dir: pull-request
+          args:
+            - '--no-watch-fs'
+            - '--no-daemon'
+            - '--continue'
+            - test
+      on_failure:
+        put: pull-request
+        params:
+          path: pull-request
+          status: failure
+    - put: pull-request
+      params:
+        path: pull-request
+        status: success
