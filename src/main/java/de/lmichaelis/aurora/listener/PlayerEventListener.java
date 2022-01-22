@@ -18,6 +18,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Set;
 
 /**
@@ -25,7 +26,7 @@ import java.util.Set;
  */
 public final class PlayerEventListener extends BaseListener {
 	// Note: This set of blocks was adapted from GriefPrevention
-	private static final Set<Material> INTERACT_PROTECTED_BLOCKS = Set.of(
+	private static final EnumSet<Material> INTERACT_PROTECTED_BLOCKS = EnumSet.of(
 			Material.ANVIL,
 			Material.BEACON,
 			Material.BEE_NEST,
@@ -46,7 +47,7 @@ public final class PlayerEventListener extends BaseListener {
 	);
 
 	// Note: This set of blocks was adapted from GriefPrevention
-	private static final Set<Material> BUILD_PROTECTED_BLOCKS = Set.of(
+	private static final EnumSet<Material> BUILD_PROTECTED_BLOCKS = EnumSet.of(
 			Material.NOTE_BLOCK,
 			Material.REPEATER,
 			Material.DRAGON_EGG,
@@ -56,7 +57,7 @@ public final class PlayerEventListener extends BaseListener {
 	);
 
 	// Note: This set of blocks was adapted from GriefPrevention
-	private static final Set<Material> BUILD_PROTECTED_ITEMS = Set.of(
+	private static final EnumSet<Material> BUILD_PROTECTED_ITEMS = EnumSet.of(
 			Material.BONE_MEAL,
 			Material.ARMOR_STAND,
 			Material.END_CRYSTAL,
