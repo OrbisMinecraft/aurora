@@ -3,6 +3,7 @@
 package de.lmichaelis.aurora.listener;
 
 import de.lmichaelis.aurora.Aurora;
+import de.lmichaelis.aurora.Predicates;
 import de.lmichaelis.aurora.model.Claim;
 import de.lmichaelis.aurora.model.Group;
 import de.lmichaelis.aurora.model.User;
@@ -17,68 +18,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.Set;
-
 /**
  * Event handlers for player events.
  */
 public final class PlayerEventListener extends BaseListener {
-	// Note: This set of blocks was adapted from GriefPrevention
-	private static final EnumSet<Material> INTERACT_PROTECTED_BLOCKS = EnumSet.of(
-			Material.ANVIL,
-			Material.BEACON,
-			Material.BEE_NEST,
-			Material.BEEHIVE,
-			Material.BELL,
-			Material.CAKE,
-			Material.CAULDRON,
-			Material.COMPOSTER,
-			Material.CAVE_VINES,
-			Material.CAVE_VINES_PLANT,
-			Material.CHIPPED_ANVIL,
-			Material.DAMAGED_ANVIL,
-			Material.JUKEBOX,
-			Material.PUMPKIN,
-			Material.RESPAWN_ANCHOR,
-			Material.ROOTED_DIRT,
-			Material.SWEET_BERRY_BUSH
-	);
-
-	// Note: This set of blocks was adapted from GriefPrevention
-	private static final EnumSet<Material> BUILD_PROTECTED_BLOCKS = EnumSet.of(
-			Material.NOTE_BLOCK,
-			Material.REPEATER,
-			Material.DRAGON_EGG,
-			Material.DAYLIGHT_DETECTOR,
-			Material.COMPARATOR,
-			Material.REDSTONE_WIRE
-	);
-
-	// Note: This set of blocks was adapted from GriefPrevention
-	private static final EnumSet<Material> BUILD_PROTECTED_ITEMS = EnumSet.of(
-			Material.BONE_MEAL,
-			Material.ARMOR_STAND,
-			Material.END_CRYSTAL,
-			Material.FLINT_AND_STEEL,
-			Material.INK_SAC,
-			Material.GLOW_INK_SAC,
-			Material.MINECART,
-			Material.CHEST_MINECART,
-			Material.TNT_MINECART,
-			Material.HOPPER_MINECART,
-			Material.FURNACE_MINECART
-	);
-
-	private static final Set<Material> SPAWN_EGGS;
-	private static final Set<Material> DYES;
-
-	static {
-		SPAWN_EGGS = Set.copyOf(Arrays.stream(Material.values()).filter(material -> material.name().endsWith("_SPAWN_EGG")).toList());
-		DYES = Set.copyOf(Arrays.stream(Material.values()).filter(material -> material.name().endsWith("_DYE")).toList());
-	}
-
 	public PlayerEventListener(final Aurora plugin) {
 		super(plugin);
 	}
@@ -218,37 +161,32 @@ public final class PlayerEventListener extends BaseListener {
 		if (action == Action.PHYSICAL) {
 			// Rule: Only people with build permissions may execute physical actions in a claim.
 			if (claim.isAllowed(player, Group.BUILD)) return;
-		} else if (action == Action.RIGHT_CLICK_BLOCK && hold != null) {
-			if (BUILD_PROTECTED_ITEMS.contains(holdType) || DYES.contains(holdType) || SPAWN_EGGS.contains(holdType) || Tag.ITEMS_BOATS.isTagged(holdType)) {
-				// Rule: Entities may only be created or altered by players with the BUILD permission
-				if (claim.isAllowed(player, Group.BUILD)) return;
-			}
-		} else {
+		} else { // if (action == Action.RIGHT_CLICK_BLOCK)
 			final var subjectType = subject.getType();
 
 			if (subject.getState() instanceof Container) {
 				// Rule: Inventories in claims may only be accessed by players with the STEAL permission
-				// TODO: Special rule for lecterns: Viewing a book in a lectern should be allowed with the ACCESS permission
-				// TODO: Special rule for placing
+				// TODO: Special rule for lecterns: Viewing a book in a lectern should be allowed with
+				//       the ACCESS permission
 				if (claim.isAllowed(player, Group.STEAL)) return;
-			} else if (BUILD_PROTECTED_BLOCKS.contains(subjectType) || Tag.FLOWER_POTS.isTagged(subjectType)) {
+			} else if (Predicates.isInteractBuildProtected(subjectType)) {
 				// Rule: Build-protected blocks in claims may only be accessed by players with the BUILD permission
 				if (claim.isAllowed(player, Group.BUILD)) return;
-			} else if (INTERACT_PROTECTED_BLOCKS.contains(subjectType) ||
-					Tag.CANDLES.isTagged(subjectType) ||
-					Tag.CANDLE_CAKES.isTagged(subjectType) ||
-					Tag.WOODEN_TRAPDOORS.isTagged(subjectType) ||
-					Tag.WOODEN_DOORS.isTagged(subjectType) ||
-					Tag.FENCE_GATES.isTagged(subjectType) ||
-					Tag.BUTTONS.isTagged(subjectType) ||
-					subjectType == Material.LEVER) {
+			} else if (Predicates.isInteractInteractProtected(subjectType)) {
 				// Rule: Interact-protected blocks in claims may only be accessed by players with the INTERACT permission
 				if (claim.isAllowed(player, Group.INTERACT)) return;
+			} else if (hold != null && Predicates.isUseBuildProtected(holdType)) {
+				// Rule: Entities may only be created or altered by players with the BUILD permission
+				if (claim.isAllowed(player, Group.BUILD)) return;
 			}
 		}
 
 		Aurora.logger.warn("Unhandled PlayerInteractEvent(item: {}, action: {}, blockClicked: {}, hand: {})",
-				event.getItem(), event.getAction(), event.getClickedBlock() == null ? "null" : event.getClickedBlock().getType(),
+				event.getItem(),
+				event.getAction(),
+				event.getClickedBlock() == null
+						? "null"
+						: event.getClickedBlock().getType(),
 				event.getHand());
 		event.setCancelled(true);
 	}
