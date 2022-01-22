@@ -60,6 +60,8 @@ public final class Interactions {
 			user.usedClaimBlocks += sizeX * sizeZ;
 			user.update();
 
+			previousLocation.setY(previousLocation.getWorld().getMinHeight());
+			targetedLocation.setY(targetedLocation.getWorld().getMaxHeight());
 			new Claim(player.getUniqueId(), "test", previousLocation, targetedLocation).save();
 		} else {
 			// Feature: Inspect a claim.
