@@ -9,12 +9,10 @@ import de.lmichaelis.aurora.model.Claim;
 import de.lmichaelis.aurora.model.Group;
 import de.lmichaelis.aurora.model.User;
 import org.bukkit.block.Container;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.Axolotl;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Fish;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -107,7 +105,7 @@ public final class PlayerEventListener extends BaseListener {
 				}
 			} else if (Predicates.isInteractBuildProtected(subjectType)) {
 				// Rule: Build-protected blocks in claims may only be accessed by players with the BUILD permission
-				if (!claim.isAllowed(player, Group.BUILD))  {
+				if (!claim.isAllowed(player, Group.BUILD)) {
 					event.setCancelled(true);
 					return;
 				}
@@ -148,8 +146,30 @@ public final class PlayerEventListener extends BaseListener {
 			if (claim.isAllowed(player, Group.ACCESS)) return;
 		}
 
-		// Rule: Dying sheep and milking cows and other animal interactions requires the ACCESS group
+		// Rule: Dying sheep and milking cows and other animal interactions requires the ACCESS group.
+		//       Note that this also includes trading with villagers.
 		if (entity instanceof Animals) {
+			if (claim.isAllowed(player, Group.ACCESS)) return;
+		}
+
+		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onPlayerFish(final @NotNull PlayerFishEvent event) {
+		final var subject = event.getCaught();
+		final var player = event.getPlayer();
+
+		// Rule: If nothing was caught, ignore the event
+		if (subject == null) return;
+
+		final var claim = Claim.getClaim(subject.getLocation());
+
+		// Rule: Players can fish all entities outside of claims without restriction
+		if (claim == null) return;
+
+		// Rule: Only players with the ACCESS group can fish armor stands, animals and vehicles from inside claims
+		if (subject.getType() == EntityType.ARMOR_STAND || subject instanceof Animals || subject instanceof Vehicle) {
 			if (claim.isAllowed(player, Group.ACCESS)) return;
 		}
 
