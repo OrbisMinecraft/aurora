@@ -9,6 +9,8 @@ import de.lmichaelis.aurora.model.Claim;
 import de.lmichaelis.aurora.model.Group;
 import de.lmichaelis.aurora.model.User;
 import org.bukkit.block.Container;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.Axolotl;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fish;
 import org.bukkit.event.EventHandler;
@@ -135,8 +137,9 @@ public final class PlayerEventListener extends BaseListener {
 		if (claim == null) return;
 
 		// Rule: Interacting with armor stands and item frames as well as chest, hopper and furnace
-		//       minecarts and horses and mules requires the STEAL group
-		if (Predicates.hasEntityContainer(entity)) {
+		//       minecarts and horses and mules requires the STEAL group. Additionally, picking up
+		//       fishes and axolotls also requires the STEAL group.
+		if (Predicates.hasEntityContainer(entity) || entity instanceof Fish || entity instanceof Axolotl) {
 			if (claim.isAllowed(player, Group.STEAL)) return;
 		}
 
