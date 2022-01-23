@@ -8,6 +8,7 @@ import de.lmichaelis.aurora.Predicates;
 import de.lmichaelis.aurora.model.Claim;
 import de.lmichaelis.aurora.model.Group;
 import de.lmichaelis.aurora.model.User;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.Waterlogged;
@@ -15,6 +16,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 
@@ -230,5 +232,32 @@ public final class PlayerEventListener extends BaseListener {
 
 		player.closeInventory();
 		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onPlayerTeleport(final @NotNull PlayerTeleportEvent event) {
+		final var player = event.getPlayer();
+		final var claim = Claim.getClaim(event.getTo());
+
+		// Rule: You can teleport to anywhere in the wild
+		if (claim == null) return;
+
+		// Rule: You can only teleport into claims in which you have the ACCESS group using
+		//       chorus fruit or ender pearls
+		if (event.getCause() == PlayerTeleportEvent.TeleportCause.CHORUS_FRUIT ||
+				event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL) {
+			if (claim.isAllowed(player, Group.ACCESS)) return;
+
+			// Quirk: If the player teleported using an ender pearl and is not in creative mode,
+			//        we have to give it back to them
+			if (event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL &&
+					player.getGameMode() != GameMode.CREATIVE) {
+				player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL, 1));
+			}
+
+			event.setCancelled(true);
+		}
+
+		// Rule: Any other mode of teleportation is okay
 	}
 }
