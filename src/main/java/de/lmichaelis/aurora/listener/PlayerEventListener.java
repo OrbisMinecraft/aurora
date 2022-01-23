@@ -215,4 +215,20 @@ public final class PlayerEventListener extends BaseListener {
 
 		event.setCancelled(true);
 	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onPlayerTakeLecternBook(final @NotNull PlayerTakeLecternBookEvent event) {
+		final var player = event.getPlayer();
+		final var subject = event.getLectern();
+		final var claim = Claim.getClaim(subject.getLocation());
+
+		// Rule: You can remove books from all lecterns outside of claims
+		if (claim == null) return;
+
+		// Rule: Players remove books from lecterns only if they're in the STEAL group
+		if (claim.isAllowed(player, Group.STEAL)) return;
+
+		player.closeInventory();
+		event.setCancelled(true);
+	}
 }
