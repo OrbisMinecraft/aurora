@@ -8,14 +8,13 @@ import de.lmichaelis.aurora.Predicates;
 import de.lmichaelis.aurora.model.Claim;
 import de.lmichaelis.aurora.model.Group;
 import de.lmichaelis.aurora.model.User;
+import org.bukkit.Material;
 import org.bukkit.block.Container;
+import org.bukkit.block.data.Waterlogged;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerFishEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 
@@ -172,6 +171,28 @@ public final class PlayerEventListener extends BaseListener {
 		if (subject.getType() == EntityType.ARMOR_STAND || subject instanceof Animals || subject instanceof Vehicle) {
 			if (claim.isAllowed(player, Group.ACCESS)) return;
 		}
+
+		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onPlayerBucketEmpty(final @NotNull PlayerBucketEmptyEvent event) {
+		final var player = event.getPlayer();
+		var subject = event.getBlockClicked().getRelative(event.getBlockFace());
+
+		// Quirk: If we're water-logging a block, the event actually applies to the
+		//        clicked block, not the adjacent one
+		if (event.getBlockClicked() instanceof Waterlogged && event.getBucket() == Material.WATER_BUCKET) {
+			subject = event.getBlockClicked();
+		}
+
+		final var claim = Claim.getClaim(subject.getLocation());
+
+		// Rule: Players can always empty buckets outside of claims
+		if (claim == null) return;
+
+		// Rule: Players can empty buckets only in claims where they have the BUILD group
+		if (claim.isAllowed(player, Group.BUILD)) return;
 
 		event.setCancelled(true);
 	}
