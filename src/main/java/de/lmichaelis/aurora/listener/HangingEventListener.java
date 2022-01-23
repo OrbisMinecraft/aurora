@@ -11,6 +11,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -49,6 +50,27 @@ public final class HangingEventListener extends BaseListener {
 			}
 		}
 
+		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onHangingPlace(final @NotNull HangingPlaceEvent event) {
+		final var player = event.getPlayer();
+		final var subject = event.getEntity();
+		final var claim = Claim.getClaim(subject.getLocation());
+
+		// Rule: Hanging entities can always be placed outside of claims
+		if (claim == null) return;
+
+		// TODO: Can `player` actually be null?
+		assert player != null;
+
+		// TODO: We can't detect if a player is removing an item from an item frame yet.
+		//       Maybe this is handled by another listener but I don't currently see how.
+		// Rule: Only players with the BUILD group can place hanging entities inside claims
+		if (claim.isAllowed(player, Group.BUILD)) return;
+
+		player.sendMessage(plugin.config.messages.noPermission);
 		event.setCancelled(true);
 	}
 }
