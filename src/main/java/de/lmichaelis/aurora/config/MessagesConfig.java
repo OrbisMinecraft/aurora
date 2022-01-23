@@ -17,4 +17,5 @@ public final class MessagesConfig {
 	public String claimResized = "§aClaim resized (%d x %d blocks).";
 	public String resizingClaim = "§aResizing claim.";
 	public String noPermission = "§cYou don't have permission to do that here.";
+	public String raidPrevented = "§cA raid has been prevented.";
 }
