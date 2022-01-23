@@ -196,4 +196,23 @@ public final class PlayerEventListener extends BaseListener {
 
 		event.setCancelled(true);
 	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onPlayerBucketFill(final @NotNull PlayerBucketFillEvent event) {
+		final var player = event.getPlayer();
+		final var subject = event.getBlockClicked();
+		final var claim = Claim.getClaim(subject.getLocation());
+
+		// Rule: Players can always fill buckets outside of claims
+		if (claim == null) return;
+
+		// Quirk: Milking a cow counts as a bucket fill event. We ignore it here because
+		//        it is already handled by #onPlayerInteractEntity()
+		if (subject.getType().isAir()) return;
+
+		// Rule: Players can fill buckets only in claims where they have the BUILD group
+		if (claim.isAllowed(player, Group.BUILD)) return;
+
+		event.setCancelled(true);
+	}
 }
