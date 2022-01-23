@@ -13,3 +13,4 @@ messages:
   claimCreated: "§aClaim created (%d x %d blocks)."
   claimResized: "§aClaim resized (%d x %d blocks)."
   resizingClaim: "§aResizing claim."
+  noPermission: "§cYou don't have permission to do that here."

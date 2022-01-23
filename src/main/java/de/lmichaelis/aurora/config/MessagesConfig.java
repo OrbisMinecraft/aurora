@@ -16,4 +16,5 @@ public final class MessagesConfig {
 	public String claimCreated = "§aClaim created (%d x %d blocks).";
 	public String claimResized = "§aClaim resized (%d x %d blocks).";
 	public String resizingClaim = "§aResizing claim.";
+	public String noPermission = "§cYou don't have permission to do that here.";
 }
