@@ -10,7 +10,7 @@ public enum Group {
 	MANAGE(4),
 	BUILD(3),
 	STEAL(2),
-	INTERACT(1),
+	ACCESS(1),
 	NONE(0);
 
 	private final int no;

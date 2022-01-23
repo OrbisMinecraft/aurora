@@ -96,10 +96,10 @@ public final class PlayerEventListener extends BaseListener {
 			} else if (Predicates.isInteractBuildProtected(subjectType)) {
 				// Rule: Build-protected blocks in claims may only be accessed by players with the BUILD permission
 				if (claim.isAllowed(player, Group.BUILD)) return;
-			} else if (Predicates.isInteractInteractProtected(subjectType)) {
+			} else if (Predicates.isInteractAccessProtected(subjectType)) {
 				// Rule: Interact-protected blocks in claims may only be accessed by players with the INTERACT permission
-				if (claim.isAllowed(player, Group.INTERACT)) return;
-			} else if (hold != null && Predicates.isUseBuildProtected(holdType)) {
+				if (claim.isAllowed(player, Group.ACCESS)) return;
+			} else if (hold != null && Predicates.isPlaceBuildProtected(holdType)) {
 				// Rule: Entities may only be created or altered by players with the BUILD permission
 				if (claim.isAllowed(player, Group.BUILD)) return;
 			}

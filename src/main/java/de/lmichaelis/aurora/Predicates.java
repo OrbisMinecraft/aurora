@@ -10,7 +10,7 @@ import java.util.EnumSet;
 
 public final class Predicates {
 	// Note: This set of blocks was adapted from GriefPrevention
-	private static final EnumSet<Material> INTERACT_PROTECTED_BLOCKS = EnumSet.of(
+	private static final EnumSet<Material> INTERACT_ACCESS_PROTECTED = EnumSet.of(
 			Material.ANVIL,
 			Material.BEACON,
 			Material.BEE_NEST,
@@ -32,7 +32,7 @@ public final class Predicates {
 	);
 
 	// Note: This set of blocks was adapted from GriefPrevention
-	private static final EnumSet<Material> BUILD_PROTECTED_BLOCKS = EnumSet.of(
+	private static final EnumSet<Material> INTERACT_BUILD_PROTECTED = EnumSet.of(
 			Material.NOTE_BLOCK,
 			Material.REPEATER,
 			Material.DRAGON_EGG,
@@ -42,7 +42,7 @@ public final class Predicates {
 	);
 
 	// Note: This set of blocks was adapted from GriefPrevention
-	private static final EnumSet<Material> BUILD_PROTECTED_ITEMS = EnumSet.of(
+	private static final EnumSet<Material> PLACE_BUILD_PROTECTED = EnumSet.of(
 			Material.BONE_MEAL,
 			Material.ARMOR_STAND,
 			Material.END_CRYSTAL,
@@ -64,8 +64,8 @@ public final class Predicates {
 		DYES = EnumSet.copyOf(Arrays.stream(Material.values()).filter(material -> material.name().endsWith("_DYE")).toList());
 	}
 
-	public static boolean isInteractInteractProtected(final Material material) {
-		return INTERACT_PROTECTED_BLOCKS.contains(material) ||
+	public static boolean isInteractAccessProtected(final Material material) {
+		return INTERACT_ACCESS_PROTECTED.contains(material) ||
 				Tag.CANDLES.isTagged(material) ||
 				Tag.CANDLE_CAKES.isTagged(material) ||
 				Tag.WOODEN_TRAPDOORS.isTagged(material) ||
@@ -75,12 +75,12 @@ public final class Predicates {
 	}
 
 	public static boolean isInteractBuildProtected(final Material material) {
-		return BUILD_PROTECTED_BLOCKS.contains(material) ||
+		return INTERACT_BUILD_PROTECTED.contains(material) ||
 				Tag.FLOWER_POTS.isTagged(material);
 	}
 
-	public static boolean isUseBuildProtected(final Material material) {
-		return BUILD_PROTECTED_ITEMS.contains(material) ||
+	public static boolean isPlaceBuildProtected(final Material material) {
+		return PLACE_BUILD_PROTECTED.contains(material) ||
 				DYES.contains(material) ||
 				SPAWN_EGGS.contains(material) ||
 				Tag.ITEMS_BOATS.isTagged(material);
