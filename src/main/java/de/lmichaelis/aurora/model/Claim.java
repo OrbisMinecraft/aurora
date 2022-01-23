@@ -26,32 +26,48 @@ import java.util.UUID;
 @DatabaseTable(tableName = "claims")
 public final class Claim {
     private final HashMap<UUID, UserGroup> userGroupById = new HashMap<>();
+
     @DatabaseField(generatedId = true)
     public int id;
+
     @DatabaseField
     public String name;
+
     @DatabaseField(canBeNull = false)
     public Date createdAt;
+
     @DatabaseField(canBeNull = false, columnName = "min_x", index = true, indexName = "claims_location_idx")
     public int minX;
+
     @DatabaseField(canBeNull = false, columnName = "min_y", index = true, indexName = "claims_location_idx")
     public int minY;
+
     @DatabaseField(canBeNull = false, columnName = "min_z", index = true, indexName = "claims_location_idx")
     public int minZ;
+
     @DatabaseField(canBeNull = false, columnName = "max_x", index = true, indexName = "claims_location_idx")
     public int maxX;
+
     @DatabaseField(canBeNull = false, columnName = "max_y", index = true, indexName = "claims_location_idx")
     public int maxY;
+
     @DatabaseField(canBeNull = false, columnName = "max_z", index = true, indexName = "claims_location_idx")
     public int maxZ;
+
     @DatabaseField(columnName = "parent_id", foreign = true, index = true, indexName = "claims_parent_idx")
     public Claim parent;
+
     @DatabaseField(canBeNull = false)
     public UUID owner;
+
     @DatabaseField(canBeNull = false, width = 64, index = true, indexName = "claims_location_idx")
     public String world;
+
     @ForeignCollectionField(foreignFieldName = "claim", eager = true)
     private ForeignCollection<UserGroup> userGroups;
+
+    @DatabaseField(canBeNull = false, columnName = "mob_griefing", defaultValue = "false")
+    public boolean mobGriefing;
 
     public Claim(final @NotNull UUID owner, final @NotNull String name,
                  final @NotNull Location cornerA, final @NotNull Location cornerB) {
@@ -59,6 +75,7 @@ public final class Claim {
         this.name = name;
         this.world = cornerA.getWorld().getName();
         this.createdAt = Date.from(Instant.now());
+        this.mobGriefing = false;
 
         this.minX = Math.min(cornerA.getBlockX(), cornerB.getBlockX());
         this.minY = Math.min(cornerA.getBlockY(), cornerB.getBlockY());
@@ -73,6 +90,7 @@ public final class Claim {
         this.owner = parent.owner;
         this.world = parent.world;
         this.createdAt = Date.from(Instant.now());
+        this.mobGriefing = false;
 
         this.minX = Math.min(cornerA.getBlockX(), cornerB.getBlockX());
         this.minY = Math.min(cornerA.getBlockY(), cornerB.getBlockY());
