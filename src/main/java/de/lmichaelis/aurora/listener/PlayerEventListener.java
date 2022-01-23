@@ -148,6 +148,11 @@ public final class PlayerEventListener extends BaseListener {
 			if (claim.isAllowed(player, Group.ACCESS)) return;
 		}
 
+		// Rule: Dying sheep and milking cows and other animal interactions requires the ACCESS group
+		if (entity instanceof Animals) {
+			if (claim.isAllowed(player, Group.ACCESS)) return;
+		}
+
 		event.setCancelled(true);
 	}
 }
