@@ -109,7 +109,7 @@ public final class Claim {
                     .orderByNullsLast("parent_id", false)
                     .queryForFirst();
         } catch (SQLException e) {
-            Aurora.logger.fatal("Failed to get claim at", e);
+            Aurora.logger.severe("Failed to get claim at %s: %s".formatted(location, e));
             return null;
         }
     }
@@ -149,7 +149,7 @@ public final class Claim {
                         .countOf() > 0;
             }
         } catch (SQLException e) {
-            Aurora.logger.fatal("Failed to get claim at", e);
+            Aurora.logger.severe("Failed to get claim: %s".formatted(e));
             return true;
         }
     }
@@ -168,7 +168,7 @@ public final class Claim {
             Aurora.db.claims.create(this);
             return true;
         } catch (SQLException e) {
-            Aurora.logger.error("Failed to create a claim", e);
+            Aurora.logger.severe("Failed to create a claim: %s".formatted(e));
             return false;
         }
     }
@@ -183,7 +183,7 @@ public final class Claim {
             Aurora.db.claims.update(this);
             return true;
         } catch (SQLException e) {
-            Aurora.logger.error("Failed to update a claim", e);
+            Aurora.logger.severe("Failed to update a claim: %s".formatted(e));
             return false;
         }
     }
@@ -198,7 +198,7 @@ public final class Claim {
             Aurora.db.claims.delete(this);
             return true;
         } catch (SQLException e) {
-            Aurora.logger.error("Failed to delete a claim", e);
+            Aurora.logger.severe("Failed to delete a claim: %s".formatted(e));
             return false;
         }
     }
@@ -223,7 +223,7 @@ public final class Claim {
                 this.userGroupById.put(player.getUniqueId(), userGroup);
             }
         } catch (SQLException e) {
-            Aurora.logger.error("Failed to set a player group", e);
+            Aurora.logger.severe("Failed to set a player group: %s".formatted(e));
             return false;
         }
 

@@ -2,16 +2,19 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 package de.lmichaelis.aurora;
 
-import de.lmichaelis.aurora.command.*;
+import de.lmichaelis.aurora.command.AuroraReloadCommand;
+import de.lmichaelis.aurora.command.AuroraRootCommand;
 import de.lmichaelis.aurora.config.AuroraConfig;
 import de.lmichaelis.aurora.listener.*;
-import org.apache.logging.log4j.Logger;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPluginLoader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.logging.Logger;
 
 /**
  * Main class for the Aurora plugin which is instantiated and loaded by the
@@ -24,6 +27,14 @@ public final class Aurora extends JavaPlugin {
 
 	private BaseListener[] listeners;
 	private AuroraRootCommand command;
+
+	public Aurora() {
+		super();
+	}
+
+	protected Aurora(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
+		super(loader, description, dataFolder, file);
+	}
 
 	/**
 	 * Initializes the plugin by loading its configuration, connecting to a
@@ -50,7 +61,7 @@ public final class Aurora extends JavaPlugin {
 	 * to the database.
 	 */
 	public void onReload() {
-		Aurora.logger = this.getLog4JLogger();
+		Aurora.logger = this.getLogger();
 
 		try {
 			this.saveDefaultConfig();
@@ -94,7 +105,7 @@ public final class Aurora extends JavaPlugin {
 		try {
 			if (Aurora.db != null) Aurora.db.onDisable();
 		} catch (IOException e) {
-			getLog4JLogger().error("Failed to properly unload", e);
+			getLogger().severe("Failed to properly unload: %s".formatted(e));
 		}
 	}
 }

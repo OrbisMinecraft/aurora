@@ -44,7 +44,7 @@ public final class User {
 			Aurora.db.users.update(this);
 			return true;
 		} catch (SQLException e) {
-			Aurora.logger.error("Failed to update user (%s)".formatted(id), e);
+			Aurora.logger.severe("Failed to update user (%s): %s".formatted(id, e));
 			return false;
 		}
 	}
@@ -54,7 +54,7 @@ public final class User {
 			Aurora.db.users.create(this);
 			return true;
 		} catch (SQLException e) {
-			Aurora.logger.error("Failed to create user (%s)".formatted(id), e);
+			Aurora.logger.severe("Failed to create user (%s): %s".formatted(id, e));
 			return false;
 		}
 	}
@@ -63,7 +63,7 @@ public final class User {
 		try {
 			return Aurora.db.users.queryForId(id);
 		} catch (SQLException e) {
-			Aurora.logger.error("Failed to get user (%s)".formatted(id), e);
+			Aurora.logger.severe("Failed to get user (%s): %s".formatted(id, e));
 			return null;
 		}
 	}

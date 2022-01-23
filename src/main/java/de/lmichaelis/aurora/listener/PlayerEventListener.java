@@ -105,13 +105,13 @@ public final class PlayerEventListener extends BaseListener {
 			}
 		}
 
-		Aurora.logger.warn("Unhandled PlayerInteractEvent(item: {}, action: {}, blockClicked: {}, hand: {})",
+		Aurora.logger.warning("Unhandled PlayerInteractEvent(item: %s, action: %s, blockClicked: %s, hand: %s)".formatted(
 				event.getItem(),
 				event.getAction(),
 				event.getClickedBlock() == null
 						? "null"
 						: event.getClickedBlock().getType(),
-				event.getHand());
+				event.getHand()));
 		event.setCancelled(true);
 	}
 }
