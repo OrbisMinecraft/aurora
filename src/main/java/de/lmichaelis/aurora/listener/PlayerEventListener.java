@@ -9,6 +9,8 @@ import de.lmichaelis.aurora.model.Claim;
 import de.lmichaelis.aurora.model.Group;
 import de.lmichaelis.aurora.model.User;
 import org.bukkit.block.Container;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fish;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -121,15 +123,6 @@ public final class PlayerEventListener extends BaseListener {
 				}
 			}
 		}
-
-		Aurora.logger.warning("Unhandled PlayerInteractEvent(item: %s, action: %s, blockClicked: %s, hand: %s)".formatted(
-				event.getItem(),
-				event.getAction(),
-				event.getClickedBlock() == null
-						? "null"
-						: event.getClickedBlock().getType(),
-				event.getHand()));
-		event.setCancelled(true);
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -145,6 +138,11 @@ public final class PlayerEventListener extends BaseListener {
 		//       minecarts and horses and mules requires the STEAL group
 		if (Predicates.hasEntityContainer(entity)) {
 			if (claim.isAllowed(player, Group.STEAL)) return;
+		}
+
+		// Rule: Sitting in minecarts and boats requires the ACCESS group
+		if (entity.getType() == EntityType.MINECART || entity.getType() == EntityType.BOAT) {
+			if (claim.isAllowed(player, Group.ACCESS)) return;
 		}
 
 		event.setCancelled(true);
