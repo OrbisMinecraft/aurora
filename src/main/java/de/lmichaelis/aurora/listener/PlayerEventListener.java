@@ -55,7 +55,7 @@ public final class PlayerEventListener extends BaseListener {
 		player.setMetadata(User.METADATA_KEY, new FixedMetadataValue(plugin, user));
 	}
 
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler()
 	public void onPlayerInteract(final @NotNull PlayerInteractEvent event) {
 		final var action = event.getAction();
 		final var subject = event.getClickedBlock();
@@ -92,7 +92,6 @@ public final class PlayerEventListener extends BaseListener {
 			if (!claim.isAllowed(player, Group.BUILD)) {
 				player.sendMessage(plugin.config.messages.noPermission);
 				event.setCancelled(true);
-				return;
 			}
 		} else { // if (action == Action.RIGHT_CLICK_BLOCK)
 			final var subjectType = subject.getType();
@@ -104,28 +103,24 @@ public final class PlayerEventListener extends BaseListener {
 				if (!claim.isAllowed(player, Group.STEAL)) {
 					player.sendMessage(plugin.config.messages.noPermission);
 					event.setCancelled(true);
-					return;
 				}
 			} else if (Predicates.isInteractBuildProtected(subjectType)) {
 				// Rule: Build-protected blocks in claims may only be accessed by players with the BUILD permission
 				if (!claim.isAllowed(player, Group.BUILD)) {
 					player.sendMessage(plugin.config.messages.noPermission);
 					event.setCancelled(true);
-					return;
 				}
 			} else if (Predicates.isInteractAccessProtected(subjectType)) {
 				// Rule: Interact-protected blocks in claims may only be accessed by players with the INTERACT permission
 				if (!claim.isAllowed(player, Group.ACCESS)) {
 					player.sendMessage(plugin.config.messages.noPermission);
 					event.setCancelled(true);
-					return;
 				}
 			} else if (hold != null && Predicates.isPlaceBuildProtected(holdType)) {
 				// Rule: Entities may only be created or altered by players with the BUILD permission
 				if (!claim.isAllowed(player, Group.BUILD)) {
 					player.sendMessage(plugin.config.messages.noPermission);
 					event.setCancelled(true);
-					return;
 				}
 			}
 		}
