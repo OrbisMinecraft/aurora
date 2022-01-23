@@ -90,6 +90,7 @@ public final class PlayerEventListener extends BaseListener {
 		if (action == Action.PHYSICAL) {
 			// Rule: Only people with build permissions may execute physical actions in a claim.
 			if (!claim.isAllowed(player, Group.BUILD)) {
+				player.sendMessage(plugin.config.messages.noPermission);
 				event.setCancelled(true);
 				return;
 			}
@@ -101,24 +102,28 @@ public final class PlayerEventListener extends BaseListener {
 				// TODO: Special rule for lecterns: Viewing a book in a lectern should be allowed with
 				//       the ACCESS permission
 				if (!claim.isAllowed(player, Group.STEAL)) {
+					player.sendMessage(plugin.config.messages.noPermission);
 					event.setCancelled(true);
 					return;
 				}
 			} else if (Predicates.isInteractBuildProtected(subjectType)) {
 				// Rule: Build-protected blocks in claims may only be accessed by players with the BUILD permission
 				if (!claim.isAllowed(player, Group.BUILD)) {
+					player.sendMessage(plugin.config.messages.noPermission);
 					event.setCancelled(true);
 					return;
 				}
 			} else if (Predicates.isInteractAccessProtected(subjectType)) {
 				// Rule: Interact-protected blocks in claims may only be accessed by players with the INTERACT permission
 				if (!claim.isAllowed(player, Group.ACCESS)) {
+					player.sendMessage(plugin.config.messages.noPermission);
 					event.setCancelled(true);
 					return;
 				}
 			} else if (hold != null && Predicates.isPlaceBuildProtected(holdType)) {
 				// Rule: Entities may only be created or altered by players with the BUILD permission
 				if (!claim.isAllowed(player, Group.BUILD)) {
+					player.sendMessage(plugin.config.messages.noPermission);
 					event.setCancelled(true);
 					return;
 				}
@@ -153,6 +158,7 @@ public final class PlayerEventListener extends BaseListener {
 			if (claim.isAllowed(player, Group.ACCESS)) return;
 		}
 
+		player.sendMessage(plugin.config.messages.noPermission);
 		event.setCancelled(true);
 	}
 
@@ -174,6 +180,7 @@ public final class PlayerEventListener extends BaseListener {
 			if (claim.isAllowed(player, Group.ACCESS)) return;
 		}
 
+		player.sendMessage(plugin.config.messages.noPermission);
 		event.setCancelled(true);
 	}
 
@@ -196,6 +203,7 @@ public final class PlayerEventListener extends BaseListener {
 		// Rule: Players can empty buckets only in claims where they have the BUILD group
 		if (claim.isAllowed(player, Group.BUILD)) return;
 
+		player.sendMessage(plugin.config.messages.noPermission);
 		event.setCancelled(true);
 	}
 
@@ -215,6 +223,7 @@ public final class PlayerEventListener extends BaseListener {
 		// Rule: Players can fill buckets only in claims where they have the BUILD group
 		if (claim.isAllowed(player, Group.BUILD)) return;
 
+		player.sendMessage(plugin.config.messages.noPermission);
 		event.setCancelled(true);
 	}
 
@@ -230,6 +239,7 @@ public final class PlayerEventListener extends BaseListener {
 		// Rule: Players remove books from lecterns only if they're in the STEAL group
 		if (claim.isAllowed(player, Group.STEAL)) return;
 
+		player.sendMessage(plugin.config.messages.noPermission);
 		player.closeInventory();
 		event.setCancelled(true);
 	}
@@ -255,6 +265,7 @@ public final class PlayerEventListener extends BaseListener {
 				player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL, 1));
 			}
 
+			player.sendMessage(plugin.config.messages.noPermission);
 			event.setCancelled(true);
 		}
 
@@ -279,5 +290,7 @@ public final class PlayerEventListener extends BaseListener {
 		if (player.getGameMode() != GameMode.CREATIVE) {
 			player.getInventory().addItem(event.getEgg().getItem());
 		}
+
+		player.sendMessage(plugin.config.messages.noPermission.formatted(player.getName()));
 	}
 }
