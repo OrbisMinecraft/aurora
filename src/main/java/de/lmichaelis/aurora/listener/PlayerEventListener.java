@@ -260,4 +260,24 @@ public final class PlayerEventListener extends BaseListener {
 
 		// Rule: Any other mode of teleportation is okay
 	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onPlayerEggThrow(final @NotNull PlayerEggThrowEvent event) {
+		final var player = event.getPlayer();
+		final var claim = Claim.getClaim(event.getEgg().getLocation());
+
+		// Rule: Players can throw eggs anywhere in the wild
+		if (claim == null) return;
+
+		// Rule: Players can only throw eggs into claims that they have the ACCESS group in
+		if (claim.isAllowed(player, Group.ACCESS)) return;
+
+		// Quirk: We prevent the event by just disabling hatching
+		event.setHatching(false);
+
+		// Quirk: We have to give the egg back to the player only if they are in survival mode
+		if (player.getGameMode() != GameMode.CREATIVE) {
+			player.getInventory().addItem(event.getEgg().getItem());
+		}
+	}
 }
