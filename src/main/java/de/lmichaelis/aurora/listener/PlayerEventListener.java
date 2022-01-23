@@ -11,6 +11,7 @@ import de.lmichaelis.aurora.model.User;
 import org.bukkit.block.Container;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -112,6 +113,24 @@ public final class PlayerEventListener extends BaseListener {
 						? "null"
 						: event.getClickedBlock().getType(),
 				event.getHand()));
+		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onPlayerInteractEntity(final @NotNull PlayerInteractEntityEvent event) {
+		final var player = event.getPlayer();
+		final var entity = event.getRightClicked();
+		final var claim = Claim.getClaim(entity.getLocation());
+
+		// Rule: You can interact with all entities outside of claims without restriction
+		if (claim == null) return;
+
+		// Rule: Interacting with armor stands and item frames as well as chest, hopper and furnace
+		//       minecarts and horses and mules requires the STEAL group
+		if (Predicates.hasEntityContainer(entity)) {
+			if (claim.isAllowed(player, Group.STEAL)) return;
+		}
+
 		event.setCancelled(true);
 	}
 }

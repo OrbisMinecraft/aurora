@@ -4,6 +4,12 @@ package de.lmichaelis.aurora;
 
 import org.bukkit.Material;
 import org.bukkit.Tag;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Hanging;
+import org.bukkit.entity.minecart.PoweredMinecart;
+import org.bukkit.inventory.InventoryHolder;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -84,5 +90,12 @@ public final class Predicates {
 				DYES.contains(material) ||
 				SPAWN_EGGS.contains(material) ||
 				Tag.ITEMS_BOATS.isTagged(material);
+	}
+
+	public static boolean hasEntityContainer(final @NotNull Entity entity) {
+		return entity.getType() == EntityType.ARMOR_STAND ||
+				entity instanceof Hanging ||
+				entity instanceof InventoryHolder || // includes villagers, minecarts and all other entities with attached storage
+				entity instanceof PoweredMinecart;
 	}
 }
