@@ -81,10 +81,14 @@ public final class PlayerEventListener extends BaseListener {
 		if (claim == null) return;
 
 		// Physical interactions in claims (e.g. trampling turtle eggs) require a permission
-		// in that claim.
+		// in that claim. All the checks are inverted here, because subsequent handlers will
+		// take care of handling the events.
 		if (action == Action.PHYSICAL) {
 			// Rule: Only people with build permissions may execute physical actions in a claim.
-			if (claim.isAllowed(player, Group.BUILD)) return;
+			if (!claim.isAllowed(player, Group.BUILD)) {
+				event.setCancelled(true);
+				return;
+			}
 		} else { // if (action == Action.RIGHT_CLICK_BLOCK)
 			final var subjectType = subject.getType();
 
@@ -92,16 +96,28 @@ public final class PlayerEventListener extends BaseListener {
 				// Rule: Inventories in claims may only be accessed by players with the STEAL permission
 				// TODO: Special rule for lecterns: Viewing a book in a lectern should be allowed with
 				//       the ACCESS permission
-				if (claim.isAllowed(player, Group.STEAL)) return;
+				if (!claim.isAllowed(player, Group.STEAL)) {
+					event.setCancelled(true);
+					return;
+				}
 			} else if (Predicates.isInteractBuildProtected(subjectType)) {
 				// Rule: Build-protected blocks in claims may only be accessed by players with the BUILD permission
-				if (claim.isAllowed(player, Group.BUILD)) return;
+				if (!claim.isAllowed(player, Group.BUILD))  {
+					event.setCancelled(true);
+					return;
+				}
 			} else if (Predicates.isInteractAccessProtected(subjectType)) {
 				// Rule: Interact-protected blocks in claims may only be accessed by players with the INTERACT permission
-				if (claim.isAllowed(player, Group.ACCESS)) return;
+				if (!claim.isAllowed(player, Group.ACCESS)) {
+					event.setCancelled(true);
+					return;
+				}
 			} else if (hold != null && Predicates.isPlaceBuildProtected(holdType)) {
 				// Rule: Entities may only be created or altered by players with the BUILD permission
-				if (claim.isAllowed(player, Group.BUILD)) return;
+				if (!claim.isAllowed(player, Group.BUILD)) {
+					event.setCancelled(true);
+					return;
+				}
 			}
 		}
 
