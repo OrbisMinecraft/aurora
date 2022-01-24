@@ -7,6 +7,7 @@ import de.lmichaelis.aurora.Predicates;
 import de.lmichaelis.aurora.model.Claim;
 import de.lmichaelis.aurora.model.Group;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Vehicle;
@@ -14,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.projectiles.BlockProjectileSource;
 import org.jetbrains.annotations.NotNull;
 
@@ -89,5 +91,26 @@ public final class EntityEventListener extends BaseListener {
 		//        gravity block and setting some metadata on it.
 
 		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onProjectileHit(final @NotNull ProjectileHitEvent event) {
+		final var block = event.getHitBlock();
+		final var projectile = event.getEntity();
+
+		// Quirk: Shooting chorus flowers does not emit a `EntityChangeBlockEvent`
+		// Rule: Only players with the BUILD group may break chorus flowers in claims
+		if (block != null && block.getType() == Material.CHORUS_FLOWER) {
+			final var claim = Claim.getClaim(block.getLocation());
+
+			if (claim == null) return;
+			if (projectile.getShooter() instanceof final Player player) {
+				if (claim.isAllowed(player, Group.BUILD)) return;
+			}
+
+			// TODO: Find out whether we should check for mob griefing or projectiles
+			//       fired by dispensers here
+			event.setCancelled(true);
+		}
 	}
 }
