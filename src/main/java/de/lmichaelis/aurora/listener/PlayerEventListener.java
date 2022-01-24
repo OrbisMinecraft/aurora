@@ -147,11 +147,8 @@ public final class PlayerEventListener extends BaseListener {
 			if (claim.isAllowed(player, Group.ACCESS)) return;
 		}
 
-		// Rule: Dying sheep and milking cows and other animal interactions requires the ACCESS group.
-		//       Note that this also includes trading with villagers.
-		if (entity instanceof Animals) {
-			if (claim.isAllowed(player, Group.ACCESS)) return;
-		}
+		// Rule: Players with the ACCESS group are allowed to interact with all other entities in the claim
+		if (claim.isAllowed(player, Group.ACCESS)) return;
 
 		player.sendMessage(plugin.config.messages.noPermission);
 		event.setCancelled(true);
