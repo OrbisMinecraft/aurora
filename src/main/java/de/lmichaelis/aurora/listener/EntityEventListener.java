@@ -7,15 +7,11 @@ import de.lmichaelis.aurora.Predicates;
 import de.lmichaelis.aurora.model.Claim;
 import de.lmichaelis.aurora.model.Group;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.EntityBreakDoorEvent;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityInteractEvent;
-import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.projectiles.BlockProjectileSource;
 import org.jetbrains.annotations.NotNull;
 
@@ -112,6 +108,58 @@ public final class EntityEventListener extends BaseListener {
 			// TODO: Find out whether we should check for mob griefing or projectiles
 			//       fired by dispensers here
 			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onPotionSplash(final @NotNull PotionSplashEvent event) {
+		final var potion = event.getPotion();
+		final var thrower = potion.getShooter();
+		final var player = thrower instanceof Player ? (Player) thrower : null;
+
+		// I don't know when it can be null. Just ignore potions thrown by nobody.
+		if (thrower == null) return;
+
+		for (final var effect : potion.getEffects()) {
+			// Rule: Always allow all positive potion effects
+			if (Predicates.isPositiveEffect(effect)) continue;
+
+			for (final var affected : event.getAffectedEntities()) {
+				// Rule: Always affect the thrower with negative effects
+				if (affected == thrower) continue;
+				if (!Predicates.isProtectedEntity(affected)) continue;
+
+				// TODO: Cache the claim for better efficiency
+				final var claim = Claim.getClaim(affected.getEyeLocation());
+
+				// Rule: Players can apply all effects to all entities outside of claims
+				if (claim == null) return;
+
+				if (player != null) {
+					// Rule: Players cannot be damaged by potions thrown by other players
+					//       in PvP-protected claims
+					if (affected instanceof Player) {
+						if (!claim.pvpEnabled) {
+							event.setIntensity(affected, 0);
+							player.sendMessage(plugin.config.messages.pvpDisabled);
+						}
+
+						continue;
+					}
+
+					// Rule: Players can only apply negative effects to entities inside
+					//       claims if they have the BUILD group
+					if (!claim.isAllowed(player, Group.BUILD)) {
+						event.setIntensity(affected, 0);
+						player.sendMessage(plugin.config.messages.noPermission);
+					}
+				} else if (thrower instanceof final BlockProjectileSource source) {
+					// Rule: Dispensers in a claim owned by the same player can apply negative
+					//       effects to entities inside it.
+					final var sourceClaim = Claim.getClaim(source.getBlock().getLocation());
+					if (sourceClaim == null || sourceClaim.owner != claim.owner) event.setIntensity(affected, 0);
+				}
+			}
 		}
 	}
 }

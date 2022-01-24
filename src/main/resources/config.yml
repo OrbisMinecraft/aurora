@@ -15,3 +15,4 @@ messages:
   resizingClaim: "§aResizing claim."
   noPermission: "§cYou don't have permission to do that here."
   raidPrevented: "§cA raid has been prevented."
+  pvpDisabled: "§cPvP is disabled in this claim."
