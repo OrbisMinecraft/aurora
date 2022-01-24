@@ -106,6 +106,7 @@ public final class EntityEventListener extends BaseListener {
 			if (claim == null) return;
 			if (projectile.getShooter() instanceof final Player player) {
 				if (claim.isAllowed(player, Group.BUILD)) return;
+				player.sendMessage(plugin.config.messages.noPermission);
 			}
 
 			// TODO: Find out whether we should check for mob griefing or projectiles
