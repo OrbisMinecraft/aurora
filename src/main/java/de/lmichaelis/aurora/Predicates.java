@@ -4,15 +4,19 @@ package de.lmichaelis.aurora;
 
 import org.bukkit.Material;
 import org.bukkit.Tag;
+import org.bukkit.entity.Animals;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Set;
 
 public final class Predicates {
 	// Note: This set of blocks was adapted from GriefPrevention
@@ -72,6 +76,29 @@ public final class Predicates {
 			EntityType.CREEPER
 	);
 
+	private static final Set<PotionEffectType> POSITIVE_EFFECT_TYPES = Set.of(
+			PotionEffectType.SPEED,
+			PotionEffectType.FAST_DIGGING,
+			PotionEffectType.INCREASE_DAMAGE,
+			PotionEffectType.HEAL,
+			PotionEffectType.REGENERATION,
+			PotionEffectType.DAMAGE_RESISTANCE,
+			PotionEffectType.FIRE_RESISTANCE,
+			PotionEffectType.WATER_BREATHING,
+			PotionEffectType.INVISIBILITY,
+			PotionEffectType.NIGHT_VISION,
+			PotionEffectType.HEALTH_BOOST,
+			PotionEffectType.ABSORPTION,
+			PotionEffectType.SATURATION,
+			PotionEffectType.GLOWING,
+			PotionEffectType.LUCK,
+			PotionEffectType.SLOW_FALLING,
+			PotionEffectType.CONDUIT_POWER,
+			PotionEffectType.DOLPHINS_GRACE,
+			PotionEffectType.HERO_OF_THE_VILLAGE,
+			PotionEffectType.JUMP
+	);
+
 	private static final EnumSet<Material> SPAWN_EGGS;
 	private static final EnumSet<Material> DYES;
 
@@ -111,5 +138,13 @@ public final class Predicates {
 
 	public static boolean canEntityChangeBlock(final @NotNull Entity entity) {
 		return BLOCK_ALTERING_ENTITIES.contains(entity.getType());
+	}
+
+	public static boolean isPositiveEffect(final @NotNull PotionEffect effect) {
+		return POSITIVE_EFFECT_TYPES.contains(effect.getType());
+	}
+
+	public static boolean isProtectedEntity(final @NotNull Entity entity) {
+		return entity.getType() == EntityType.VILLAGER || entity instanceof Animals;
 	}
 }
