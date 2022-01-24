@@ -3,11 +3,18 @@
 package de.lmichaelis.aurora.listener;
 
 import de.lmichaelis.aurora.Aurora;
+import de.lmichaelis.aurora.Predicates;
 import de.lmichaelis.aurora.model.Claim;
+import de.lmichaelis.aurora.model.Group;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityBreakDoorEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.projectiles.BlockProjectileSource;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -47,5 +54,40 @@ public final class EntityEventListener extends BaseListener {
 
 			event.setCancelled(true);
 		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onEntityChangeBlock(final @NotNull EntityChangeBlockEvent event) {
+		final var block = event.getBlock();
+		final var entity = event.getEntity();
+		final var claim = Claim.getClaim(block.getLocation());
+
+		// Rule: Entities can always change blocks outside of claims
+		if (claim == null) return;
+
+		if (Predicates.canEntityChangeBlock(entity)) {
+			// Rule: Mobs can only change blocks if mob griefing is enabled in the claim
+			if (claim.mobGriefing) return;
+		} else if (entity instanceof final Projectile projectile) {
+			if (projectile.getShooter() instanceof final Player player) {
+				// Rule: Only players with build permissions may knock down dripstone or ignite TNT
+				if (claim.isAllowed(player, Group.BUILD)) return;
+			} else if (projectile.getShooter() instanceof final BlockProjectileSource source) {
+				// Rule: Dispensers shooting arrows from within a claim with the same
+				//       owner can also change blocks
+				final var sourceClaim = Claim.getClaim(source.getBlock().getLocation());
+				if (sourceClaim != null && sourceClaim.owner == claim.owner) return;
+			}
+		} else if (entity instanceof Vehicle && !entity.getPassengers().isEmpty()) {
+			// Rule: Players in boats cannot break lily pads (for example) unless
+			//       they are in the BUILD group
+			if (entity.getPassengers().get(0) instanceof final Player player && claim.isAllowed(player, Group.BUILD))
+				return;
+		}
+
+		// FIXME: Prevent sand cannons from working. This requires checking for a falling
+		//        gravity block and setting some metadata on it.
+
+		event.setCancelled(true);
 	}
 }
