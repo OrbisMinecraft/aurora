@@ -37,6 +37,29 @@ public final class EntityEventListener extends BaseListener {
 	}
 
 	@EventHandler(ignoreCancelled = true)
+	public void onEntityExplode(final @NotNull EntityExplodeEvent event) {
+		final var iter = event.blockList().iterator();
+		while (iter.hasNext()) {
+			final var block = iter.next();
+
+			// Ignore air blocks
+			if (block.getType().isAir()) continue;
+
+			// TODO: Cache the claim for better efficiency
+			final var claim = Claim.getClaim(block.getLocation());
+
+			// Rule: Explosions can affect all blocks outside of claims
+			if (claim == null) continue;
+
+			// Rule: If explosions are turned on in the claim, all blocks can be destroyed
+			if (claim.allowsExplosions) continue;
+
+			// Otherwise, prevent the block from breaking
+			iter.remove();
+		}
+	}
+
+	@EventHandler(ignoreCancelled = true)
 	public void onEntityInteract(final @NotNull EntityInteractEvent event) {
 		final var block = event.getBlock();
 
