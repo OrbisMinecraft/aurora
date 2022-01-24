@@ -72,6 +72,9 @@ public final class Claim {
     @DatabaseField(canBeNull = false, columnName = "pvp_enabled", defaultValue = "false")
     public boolean pvpEnabled;
 
+    @DatabaseField(canBeNull = false, columnName = "allows_enabled", defaultValue = "false")
+    public boolean allowsExplosions;
+
     public Claim(final @NotNull UUID owner, final @NotNull String name,
                  final @NotNull Location cornerA, final @NotNull Location cornerB) {
         this.owner = owner;
@@ -80,6 +83,7 @@ public final class Claim {
         this.createdAt = Date.from(Instant.now());
         this.mobGriefing = false;
         this.pvpEnabled = false;
+        this.allowsExplosions = false;
 
         this.minX = Math.min(cornerA.getBlockX(), cornerB.getBlockX());
         this.minY = Math.min(cornerA.getBlockY(), cornerB.getBlockY());
@@ -96,6 +100,7 @@ public final class Claim {
         this.createdAt = Date.from(Instant.now());
         this.mobGriefing = false;
         this.pvpEnabled = false;
+        this.allowsExplosions = false;
 
         this.minX = Math.min(cornerA.getBlockX(), cornerB.getBlockX());
         this.minY = Math.min(cornerA.getBlockY(), cornerB.getBlockY());
