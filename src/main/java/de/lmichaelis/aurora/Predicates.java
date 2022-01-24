@@ -62,6 +62,16 @@ public final class Predicates {
 			Material.FURNACE_MINECART
 	);
 
+	private static final EnumSet<EntityType> BLOCK_ALTERING_ENTITIES = EnumSet.of(
+			EntityType.ENDERMAN,
+			EntityType.SILVERFISH,
+			EntityType.RABBIT,
+			EntityType.RAVAGER,
+
+			EntityType.WITHER,
+			EntityType.CREEPER
+	);
+
 	private static final EnumSet<Material> SPAWN_EGGS;
 	private static final EnumSet<Material> DYES;
 
@@ -97,5 +107,9 @@ public final class Predicates {
 				entity instanceof Hanging ||
 				entity instanceof InventoryHolder || // includes villagers, minecarts and all other entities with attached storage
 				entity instanceof PoweredMinecart;
+	}
+
+	public static boolean canEntityChangeBlock(final @NotNull Entity entity) {
+		return BLOCK_ALTERING_ENTITIES.contains(entity.getType());
 	}
 }
