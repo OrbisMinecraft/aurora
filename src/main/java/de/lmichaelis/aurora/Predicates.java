@@ -4,10 +4,7 @@ package de.lmichaelis.aurora;
 
 import org.bukkit.Material;
 import org.bukkit.Tag;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Hanging;
+import org.bukkit.entity.*;
 import org.bukkit.entity.minecart.PoweredMinecart;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.potion.PotionEffect;
@@ -146,5 +143,17 @@ public final class Predicates {
 
 	public static boolean isProtectedEntity(final @NotNull Entity entity) {
 		return entity.getType() == EntityType.VILLAGER || entity instanceof Animals;
+	}
+
+	public static boolean isHostileEntity(final @NotNull Entity entity) {
+		final var type = entity.getType();
+		return entity instanceof Monster ||
+				type == EntityType.GHAST || type == EntityType.MAGMA_CUBE ||
+				type == EntityType.SHULKER || type == EntityType.SLIME ||
+				(type == EntityType.RABBIT && ((Rabbit) entity).getRabbitType() == Rabbit.Type.THE_KILLER_BUNNY) ||
+				(type == EntityType.PANDA && ((Panda) entity).getMainGene() == Panda.Gene.AGGRESSIVE) ||
+
+				// TODO: Only classify aggressive hoglins and bears as hostile
+				type == EntityType.HOGLIN || type == EntityType.POLAR_BEAR;
 	}
 }
