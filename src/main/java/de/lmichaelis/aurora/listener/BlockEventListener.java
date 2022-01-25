@@ -3,6 +3,7 @@
 package de.lmichaelis.aurora.listener;
 
 import de.lmichaelis.aurora.Aurora;
+import de.lmichaelis.aurora.AuroraUtil;
 import de.lmichaelis.aurora.model.Claim;
 import de.lmichaelis.aurora.model.Group;
 import org.bukkit.Material;
@@ -10,6 +11,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.jetbrains.annotations.NotNull;
@@ -110,5 +112,10 @@ public final class BlockEventListener extends BaseListener {
 		if (fromClaim != null && Objects.equals(fromClaim.owner, toClaim.owner)) return;
 
 		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onBlockExplode(final @NotNull BlockExplodeEvent event) {
+		AuroraUtil.neutralizeExplosion(event.blockList());
 	}
 }
