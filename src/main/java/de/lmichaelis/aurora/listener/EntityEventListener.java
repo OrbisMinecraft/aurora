@@ -199,7 +199,7 @@ public final class EntityEventListener extends BaseListener {
 				// Rule: Dispensers shooting arrows from within a claim with the same
 				//       owner can also change blocks
 				final var sourceClaim = Claim.getClaim(source.getBlock().getLocation());
-				if (sourceClaim != null && sourceClaim.owner == claim.owner) return;
+				if (sourceClaim != null && Objects.equals(sourceClaim.owner, claim.owner)) return;
 			}
 		} else if (entity instanceof Vehicle && !entity.getPassengers().isEmpty()) {
 			// Rule: Players in boats cannot break lily pads (for example) unless
