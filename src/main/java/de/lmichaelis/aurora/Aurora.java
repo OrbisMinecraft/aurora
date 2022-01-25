@@ -3,6 +3,7 @@
 package de.lmichaelis.aurora;
 
 import de.lmichaelis.aurora.command.AuroraReloadCommand;
+import de.lmichaelis.aurora.command.AuroraUnclaimCommand;
 import de.lmichaelis.aurora.command.AuroraRootCommand;
 import de.lmichaelis.aurora.config.AuroraConfig;
 import de.lmichaelis.aurora.listener.*;
@@ -47,6 +48,7 @@ public final class Aurora extends JavaPlugin {
 		// Register the base command
 		this.command = new AuroraRootCommand(this);
 		this.command.addSubCommand("reload", new AuroraReloadCommand(this));
+		this.command.addSubCommand("unclaim", new AuroraUnclaimCommand(this));
 
 		final var rootCommand = this.getCommand("aurora");
 		assert rootCommand != null;

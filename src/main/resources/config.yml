@@ -20,3 +20,5 @@ messages:
   raidPrevented: "§cA raid has been prevented."
   pvpDisabled: "§cPvP is disabled in this claim."
   noClaimCreationPermission: "§cYou don't have permission to create claims."
+  notClaimOwner: "§cYou cannot do this because you are not an owner of this claim."
+  claimDeleted: "§aClaim deleted."

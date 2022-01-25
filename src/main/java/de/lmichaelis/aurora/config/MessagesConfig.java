@@ -20,4 +20,6 @@ public final class MessagesConfig {
 	public String raidPrevented = "§cA raid has been prevented.";
 	public String pvpDisabled = "§cPvP is disabled in this claim.";
 	public String noClaimCreationPermission = "§cYou don't have permission to create claims.";
+	public String notClaimOwner = "§cYou cannot do this because you are not an owner of this claim.";
+	public String claimDeleted = "§aClaim deleted.";
 }
