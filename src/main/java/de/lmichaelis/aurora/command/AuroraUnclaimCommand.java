@@ -4,7 +4,6 @@ package de.lmichaelis.aurora.command;
 
 import de.lmichaelis.aurora.Aurora;
 import de.lmichaelis.aurora.model.Claim;
-import de.lmichaelis.aurora.model.Group;
 import de.lmichaelis.aurora.model.User;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -13,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class AuroraUnclaimCommand extends AuroraBaseCommand {
 	public AuroraUnclaimCommand(Aurora plugin) {
@@ -31,18 +31,20 @@ public class AuroraUnclaimCommand extends AuroraBaseCommand {
 
 		if (claim == null) {
 			player.sendMessage(plugin.config.messages.notAClaim);
-		} else if (!claim.isAllowed(player, Group.OWNER)) {
+		} else if (!Objects.equals(player.getUniqueId(), claim.owner)) {
 			player.sendMessage(plugin.config.messages.notClaimOwner);
 		} else {
 			claim.delete();
 
-			final var actualOwner = User.get(claim.owner);
+			final var actualOwner = User.fromMetadata(player);
 			assert actualOwner != null;
 
 			actualOwner.usedClaimBlocks -= claim.size();
 			actualOwner.update();
 
-			player.sendMessage(plugin.config.messages.claimDeleted);
+			player.sendMessage(plugin.config.messages.claimDeleted.formatted(
+					actualOwner.totalClaimBlocks - actualOwner.usedClaimBlocks
+			));
 		}
 
 		return true;

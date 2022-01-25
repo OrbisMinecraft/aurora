@@ -183,7 +183,7 @@ public final class Claim {
     }
 
     public int size() {
-        return (maxX - minX) * (maxZ - minZ);
+        return ((maxX - minX) + 1) * ((maxZ - minZ) + 1);
     }
 
     /**
