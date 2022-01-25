@@ -89,4 +89,14 @@ public final class User {
 			return false;
 		}
 	}
+
+	public boolean refresh() {
+		try {
+			Aurora.db.users.refresh(this);
+			return true;
+		} catch (SQLException e) {
+			Aurora.logger.severe("Failed to refresh user (%s): %s".formatted(id, e));
+			return false;
+		}
+	}
 }

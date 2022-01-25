@@ -6,6 +6,8 @@ import de.lmichaelis.aurora.event.PlayerAccrueClaimBlocksEvent;
 import de.lmichaelis.aurora.model.User;
 import org.bukkit.Bukkit;
 
+import java.util.Objects;
+
 /**
  * A task which adds claim blocks for every player according to the given rate.
  */
@@ -29,11 +31,11 @@ public class AccrueClaimBlocksTask implements Runnable {
 		lastRun = now;
 
 		for (final var player : Bukkit.getOnlinePlayers()) {
-			final var user = User.fromMetadata(player);
-			assert user != null;
+			final var user = Objects.requireNonNull(User.fromMetadata(player));
 
 			final var event = new PlayerAccrueClaimBlocksEvent(player, claimBlocksAdded, user.totalClaimBlocks, rate);
 			if (event.callEvent() && user.totalClaimBlocks + event.getCount() <= limit) {
+				user.refresh();
 				user.totalClaimBlocks += event.getCount();
 				user.update();
 			}

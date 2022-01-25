@@ -10,11 +10,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public final class Interactions {
 	public static void showClaimBoundaries(final @NotNull Aurora plugin, final @NotNull Player player,
 										   final @NotNull Claim claim) {
-		final var user = User.fromMetadata(player);
-		assert user != null;
+		final var user = Objects.requireNonNull(User.fromMetadata(player));
 
 		// Only run at most three visualization tasks
 		if (user.runningVisualizationTasks >= 3) return;
@@ -57,8 +58,8 @@ public final class Interactions {
 			}
 
 			final var previousLocationMeta = player.getMetadata("aurora.claimBlockSelection");
-			final var user = User.fromMetadata(player);
-			assert user != null;
+			final var user = Objects.requireNonNull(User.fromMetadata(player));
+			user.refresh();
 
 			if (plugin.config.totalClaimsLimit > 0 && user.totalClaimsUsed >= plugin.config.totalClaimsLimit) {
 				player.sendMessage(plugin.config.messages.tooManyClaims);
@@ -90,6 +91,7 @@ public final class Interactions {
 			player.sendMessage(plugin.config.messages.claimCreated.formatted(sizeX, sizeZ, remainingClaimBlocks - (sizeX * sizeZ)));
 			player.removeMetadata("aurora.claimBlockSelection", plugin);
 
+			user.refresh();
 			user.usedClaimBlocks += sizeX * sizeZ;
 			user.totalClaimsUsed += 1;
 			user.update();
