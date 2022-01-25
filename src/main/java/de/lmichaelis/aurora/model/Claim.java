@@ -63,12 +63,19 @@ public final class Claim {
 
 	@DatabaseField(canBeNull = false, width = 64, index = true, indexName = "claims_location_idx")
 	public String world;
+
 	@DatabaseField(canBeNull = false, columnName = "mob_griefing", defaultValue = "false")
 	public boolean mobGriefing;
+
 	@DatabaseField(canBeNull = false, columnName = "pvp_enabled", defaultValue = "false")
 	public boolean pvpEnabled;
+
 	@DatabaseField(canBeNull = false, columnName = "allows_enabled", defaultValue = "false")
 	public boolean allowsExplosions;
+
+	@DatabaseField(canBeNull = false, columnName = "is_admin", defaultValue = "false")
+	public boolean isAdmin;
+
 	@ForeignCollectionField(foreignFieldName = "claim", eager = true)
 	private ForeignCollection<UserGroup> userGroups;
 
@@ -81,6 +88,7 @@ public final class Claim {
 		this.mobGriefing = false;
 		this.pvpEnabled = false;
 		this.allowsExplosions = false;
+		this.isAdmin = false;
 
 		this.minX = Math.min(cornerA.getBlockX(), cornerB.getBlockX());
 		this.minY = Math.min(cornerA.getBlockY(), cornerB.getBlockY());
@@ -98,6 +106,7 @@ public final class Claim {
 		this.mobGriefing = false;
 		this.pvpEnabled = false;
 		this.allowsExplosions = false;
+		this.isAdmin = false;
 
 		this.minX = Math.min(cornerA.getBlockX(), cornerB.getBlockX());
 		this.minY = Math.min(cornerA.getBlockY(), cornerB.getBlockY());
@@ -277,7 +286,9 @@ public final class Claim {
 	public boolean isAllowed(final @NotNull OfflinePlayer player, final Group group) {
 		if (player instanceof final Player online) {
 			final var user = Objects.requireNonNull(User.fromMetadata(online));
-			if (user.adminMode) return true;
+
+			if (this.isAdmin && online.hasPermission("aurora.admin.claims")) return true;
+			if (user.adminMode && !isAdmin) return true;
 		}
 
 		return getGroup(player).encompasses(group);
