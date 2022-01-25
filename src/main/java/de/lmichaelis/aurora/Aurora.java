@@ -49,6 +49,7 @@ public final class Aurora extends JavaPlugin {
 		this.command.addSubCommand("unclaim", new AuroraUnclaimCommand(this));
 		this.command.addSubCommand("claimlist", new AuroraClaimListCommand(this));
 		this.command.addSubCommand("set-group", new AuroraSetGroupCommand(this));
+		this.command.addSubCommand("admin", new AuroraAdminModeCommand(this));
 
 		final var rootCommand = this.getCommand("aurora");
 		assert rootCommand != null;

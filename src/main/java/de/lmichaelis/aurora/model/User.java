@@ -36,6 +36,7 @@ public final class User {
 
 	// Temporary, non-persistent data
 	public int runningVisualizationTasks = 0;
+	public boolean adminMode = false;
 
 	public User(final UUID id, int totalClaims) {
 		this.id = id;
