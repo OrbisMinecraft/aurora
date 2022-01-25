@@ -30,6 +30,7 @@ messages:
 
   claimListHeader: "These are your claims:"
   claimListEntry: "§2- %s at (%d, %d); %d blocks"
+  claimListEntryAdmin: "§b- %s at (%d, %d); %d blocks (Admin)"
   claimListFooter: "You have used %d of your %d claim blocks. That means you have §a%d claim blocks remaining"
   claimListEmpty: "   You haven't created any claims yet."
 

@@ -46,12 +46,14 @@ public class AuroraUnclaimCommand extends AuroraBaseCommand {
 				ownerUser = Objects.requireNonNull(User.get(claim.owner));
 			}
 
-			ownerUser.refresh();
-			ownerUser.usedClaimBlocks -= claim.size();
-			ownerUser.totalClaimsUsed -= 1;
-			ownerUser.update();
+			if (!claim.isAdmin) {
+				ownerUser.refresh();
+				ownerUser.usedClaimBlocks -= claim.size();
+				ownerUser.totalClaimsUsed -= 1;
+				ownerUser.update();
+			}
 
-			if (Objects.equals(user.id, claim.owner)) {
+			if (Objects.equals(user.id, claim.owner) && !claim.isAdmin) {
 				// This is the actual owner of the claim
 				player.sendMessage(plugin.config.messages.claimDeletedByOwner.formatted(
 						ownerUser.totalClaimBlocks - ownerUser.usedClaimBlocks

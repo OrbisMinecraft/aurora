@@ -21,5 +21,8 @@ permissions:
     description: "Permission required to list and delete other's claims."
     default: op
   aurora.admin:
+    description: "Permission required to bypass all claim restrictions."
+    default: op
+  aurora.admin.claims:
     description: "Permission required to create and manage administrative claims."
     default: op

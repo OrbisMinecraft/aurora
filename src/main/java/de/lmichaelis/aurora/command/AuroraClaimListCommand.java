@@ -56,12 +56,21 @@ public class AuroraClaimListCommand extends AuroraBaseCommand {
 			player.sendMessage(plugin.config.messages.claimListEmpty);
 		} else {
 			for (final var claim : claims) {
-				player.sendMessage(plugin.config.messages.claimListEntry.formatted(
-						claim.name,
-						claim.minX,
-						claim.minZ,
-						claim.size()
-				));
+				if (claim.isAdmin) {
+					player.sendMessage(plugin.config.messages.claimListEntryAdmin.formatted(
+							claim.name,
+							claim.minX,
+							claim.minZ,
+							claim.size()
+					));
+				} else {
+					player.sendMessage(plugin.config.messages.claimListEntry.formatted(
+							claim.name,
+							claim.minX,
+							claim.minZ,
+							claim.size()
+					));
+				}
 			}
 		}
 

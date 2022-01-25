@@ -61,7 +61,9 @@ public final class Interactions {
 			final var user = Objects.requireNonNull(User.fromMetadata(player));
 			user.refresh();
 
-			if (plugin.config.totalClaimsLimit > 0 && user.totalClaimsUsed >= plugin.config.totalClaimsLimit) {
+			final var isAdminClaiming = user.adminMode && player.hasPermission("aurora.admin.claims");
+
+			if (plugin.config.totalClaimsLimit > 0 && user.totalClaimsUsed >= plugin.config.totalClaimsLimit && !isAdminClaiming) {
 				player.sendMessage(plugin.config.messages.tooManyClaims);
 				return;
 			}
@@ -78,7 +80,7 @@ public final class Interactions {
 			final var sizeX = Math.abs(previousLocation.getBlockX() - targetedLocation.getBlockX()) + 1;
 			final var sizeZ = Math.abs(previousLocation.getBlockZ() - targetedLocation.getBlockZ()) + 1;
 
-			if (sizeX * sizeZ > remainingClaimBlocks) {
+			if (sizeX * sizeZ > remainingClaimBlocks && !isAdminClaiming) {
 				player.sendMessage(plugin.config.messages.needMoreClaimBlocks.formatted(sizeX * sizeZ - remainingClaimBlocks));
 				return;
 			}
@@ -88,18 +90,24 @@ public final class Interactions {
 				return;
 			}
 
-			player.sendMessage(plugin.config.messages.claimCreated.formatted(sizeX, sizeZ, remainingClaimBlocks - (sizeX * sizeZ)));
 			player.removeMetadata("aurora.claimBlockSelection", plugin);
 
-			user.refresh();
-			user.usedClaimBlocks += sizeX * sizeZ;
-			user.totalClaimsUsed += 1;
-			user.update();
+			if (!isAdminClaiming) {
+				player.sendMessage(plugin.config.messages.claimCreated.formatted(sizeX, sizeZ, remainingClaimBlocks - (sizeX * sizeZ)));
+
+				user.refresh();
+				user.usedClaimBlocks += sizeX * sizeZ;
+				user.totalClaimsUsed += 1;
+				user.update();
+			} else {
+				player.sendMessage(plugin.config.messages.claimCreated.formatted(sizeX, sizeZ, 0));
+			}
 
 			previousLocation.setY(previousLocation.getWorld().getMinHeight());
 			targetedLocation.setY(targetedLocation.getWorld().getMaxHeight());
 
 			final var claim = new Claim(player.getUniqueId(), "(unnamed)", previousLocation, targetedLocation);
+			claim.isAdmin = isAdminClaiming;
 			claim.save();
 
 			showClaimBoundaries(plugin, player, claim);
@@ -111,8 +119,8 @@ public final class Interactions {
 			}
 
 			player.sendMessage(plugin.config.messages.blockClaimedBy.formatted(
-					Bukkit.getOfflinePlayer(targetedClaim.owner).getName())
-			);
+					targetedClaim.isAdmin ? "an Admin" : Bukkit.getOfflinePlayer(targetedClaim.owner).getName()
+			));
 
 			showClaimBoundaries(plugin, player, targetedClaim);
 		}
