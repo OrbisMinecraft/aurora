@@ -7,9 +7,12 @@ import de.lmichaelis.aurora.AuroraUtil;
 import de.lmichaelis.aurora.model.Claim;
 import de.lmichaelis.aurora.model.Group;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.block.data.type.Chest;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.*;
 import org.jetbrains.annotations.NotNull;
@@ -244,6 +247,22 @@ public final class BlockEventListener extends BaseListener {
 
 		final var sourceClaim = Claim.getClaim(source.getLocation());
 		if (sourceClaim != null && Objects.equals(sourceClaim.owner, targetClaim.owner)) return;
+
+		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onEntityBlockForm(final @NotNull EntityBlockFormEvent event) {
+		// We're only interested in players here
+		if (event.getEntity().getType() != EntityType.PLAYER) return;
+
+		final var claim = Claim.getClaim(event.getBlock().getLocation());
+
+		// Rule: Frost walker can be used outside of claims without restriction
+		if (claim == null) return;
+
+		// Rule: If inside a claim, frost walker can only be used by player with the BUILD permission
+		if (claim.isAllowed((Player) event.getEntity(), Group.BUILD)) return;
 
 		event.setCancelled(true);
 	}
