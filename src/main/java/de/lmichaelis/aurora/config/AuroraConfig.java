@@ -23,6 +23,7 @@ public final class AuroraConfig {
 	public boolean accrueClaimBlockEnabled = true;
 	public int accrueClaimBlocksPerHour = 100;
 	public int accrueClaimBlocksLimit = 10000;
+	public int totalClaimsLimit = 10;
 
 	/**
 	 * Loads the configuration from a file.

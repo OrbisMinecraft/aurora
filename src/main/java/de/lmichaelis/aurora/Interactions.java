@@ -58,6 +58,12 @@ public final class Interactions {
 
 			final var previousLocationMeta = player.getMetadata("aurora.claimBlockSelection");
 			final var user = User.fromMetadata(player);
+			assert user != null;
+
+			if (plugin.config.totalClaimsLimit > 0 && user.totalClaimsUsed >= plugin.config.totalClaimsLimit) {
+				player.sendMessage(plugin.config.messages.tooManyClaims);
+				return;
+			}
 
 			if (previousLocationMeta.size() == 0) {
 				player.sendMessage(plugin.config.messages.claimCornerSet);
@@ -85,6 +91,7 @@ public final class Interactions {
 			player.removeMetadata("aurora.claimBlockSelection", plugin);
 
 			user.usedClaimBlocks += sizeX * sizeZ;
+			user.totalClaimsUsed += 1;
 			user.update();
 
 			previousLocation.setY(previousLocation.getWorld().getMinHeight());

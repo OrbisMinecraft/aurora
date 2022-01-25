@@ -5,6 +5,7 @@ claimInvestigationTool: 'STICK'
 accrueClaimBlockEnabled: true
 accrueClaimBlocksPerHour: 100
 accrueClaimBlocksLimit: 10000
+totalClaimsLimit: 10
 messages:
   tooFarAway: "§cThat's too far away!"
   notAClaim: "§cThere is no claim here."
@@ -24,6 +25,7 @@ messages:
   claimDeleted: "§aClaim deleted. You have %d claim blocks left."
   unknownPlayer: "§cI've never seen a player by that name."
   cannotSetOwnGroup: "§cYou can't change your own group."
+  tooManyClaims: "§cYou can't create any more claims."
 
   claimListHeader: "These are your claims:"
   claimListEntry: "§2- %s at (%d, %d); %d blocks"
