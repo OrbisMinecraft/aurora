@@ -27,7 +27,14 @@ public class AuroraAdminModeCommand extends AuroraBaseCommand {
 		if (!(sender instanceof final Player player)) return false;
 		final var user = User.fromMetadata(player);
 		assert user != null;
-		user.adminMode = true;
+
+		if (user.adminMode) {
+			user.adminMode = false;
+			player.sendMessage(plugin.config.messages.leaveAdminMode);
+		} else {
+			user.adminMode = true;
+			player.sendMessage(plugin.config.messages.enterAdminMode);
+		}
 
 		return true;
 	}

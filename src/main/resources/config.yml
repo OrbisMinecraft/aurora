@@ -32,3 +32,6 @@ messages:
   claimListEntry: "§2- %s at (%d, %d); %d blocks"
   claimListFooter: "You have used %d of your %d claim blocks. That means you have §a%d claim blocks remaining"
   claimListEmpty: "   You haven't created any claims yet."
+
+  leaveAdminMode: "§aYou've left administrative mode."
+  enterAdminMode: "§aYou've entered administrative mode."
