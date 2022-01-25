@@ -23,6 +23,11 @@ public final class Interactions {
 		final var targetedClaim = Claim.getClaim(targetedLocation);
 
 		if (tool == plugin.config.claimCreationTool) {
+			if (!player.hasPermission("aurora.claims")) {
+				player.sendMessage(plugin.config.messages.noClaimCreationPermission);
+				return;
+			}
+
 			// Feature: Create a claim.
 			if (targetedClaim != null) {
 				player.sendMessage(plugin.config.messages.alreadyClaimed);
