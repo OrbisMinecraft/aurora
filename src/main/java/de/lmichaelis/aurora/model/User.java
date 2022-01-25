@@ -30,6 +30,9 @@ public final class User {
 	@DatabaseField(canBeNull = false)
 	public int usedClaimBlocks = 0;
 
+	// Temporary, non-persistent data
+	public int runningVisualizationTasks = 0;
+
 	public User(final UUID id, int totalClaims) {
 		this.id = id;
 		this.totalClaimBlocks = totalClaims;
