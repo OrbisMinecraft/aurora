@@ -48,7 +48,7 @@ public final class BlockEventListener extends BaseListener {
 				final var relativeClaim = Claim.getClaim(relative.getLocation());
 				final var relativeOwner = relativeClaim == null ? null : relativeClaim.owner;
 
-				if (claimOwner == relativeOwner) continue;
+				if (Objects.equals(claimOwner, relativeOwner)) continue;
 
 				// Don't allow the chests to connect!
 				relativeBD.setType(Chest.Type.SINGLE);
