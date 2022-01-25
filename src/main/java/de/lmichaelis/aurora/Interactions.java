@@ -5,6 +5,7 @@ package de.lmichaelis.aurora;
 import de.lmichaelis.aurora.model.Claim;
 import de.lmichaelis.aurora.model.User;
 import de.lmichaelis.aurora.task.ClaimVisualizationTask;
+import jdk.jshell.spi.SPIResolutionException;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -57,8 +58,9 @@ public final class Interactions {
 				return;
 			}
 
-			final var previousLocationMeta = player.getMetadata("aurora.claimBlockSelection");
+
 			final var user = Objects.requireNonNull(User.fromMetadata(player));
+			final var previousLocation = user.selectedLocation;
 			user.refresh();
 
 			final var isAdminClaiming = user.adminMode && player.hasPermission("aurora.admin.claims");
@@ -70,17 +72,16 @@ public final class Interactions {
 				return;
 			}
 
-			if (previousLocationMeta.size() == 0) {
+			if (previousLocation == null) {
 				player.sendMessage(plugin.config.messages.claimCornerSet.formatted(
 						targetedLocation.getBlockX(),
 						targetedLocation.getBlockY(),
 						targetedLocation.getBlockZ()
 				));
-				player.setMetadata("aurora.claimBlockSelection", new FixedMetadataValue(plugin, targetedLocation));
+				user.selectedLocation = targetedLocation;
 				return;
 			}
 
-			final var previousLocation = (Location) previousLocationMeta.get(0).value();
 			final var remainingClaimBlocks = user.totalClaimBlocks - user.usedClaimBlocks;
 
 			final var sizeX = Math.abs(previousLocation.getBlockX() - targetedLocation.getBlockX()) + 1;
@@ -96,7 +97,7 @@ public final class Interactions {
 				return;
 			}
 
-			player.removeMetadata("aurora.claimBlockSelection", plugin);
+			user.selectedLocation = null;
 
 			if (!isAdminClaiming) {
 				player.sendMessage(plugin.config.messages.claimCreated.formatted(sizeX, sizeZ, remainingClaimBlocks - (sizeX * sizeZ)));

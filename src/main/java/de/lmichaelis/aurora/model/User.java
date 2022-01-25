@@ -6,6 +6,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import de.lmichaelis.aurora.Aurora;
 import de.lmichaelis.aurora.AuroraUtil;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,6 +38,7 @@ public final class User {
 	// Temporary, non-persistent data
 	public int runningVisualizationTasks = 0;
 	public boolean adminMode = false;
+	public Location selectedLocation = null;
 
 	public User(final UUID id, int totalClaims) {
 		this.id = id;
