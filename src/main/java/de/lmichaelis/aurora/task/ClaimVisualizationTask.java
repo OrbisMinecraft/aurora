@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ClaimVisualizationTask implements Runnable {
+	private static final Particle PARTICLE = Particle.REDSTONE.builder().force(false).particle();
 	private final @NotNull Player player;
 
 	private final Claim claim;
@@ -20,24 +21,24 @@ public class ClaimVisualizationTask implements Runnable {
 	public ClaimVisualizationTask(final @NotNull Claim claim, final @NotNull Player player, Color color) {
 		this.player = player;
 		this.claim = claim;
-		this.options = new Particle.DustOptions(color, 2);
+		this.options = new Particle.DustOptions(color, 3);
 
 		this.particleDensityX = (claim.maxX - claim.minX) / 2;
 		this.particleDensityY = (claim.maxY - claim.minY) / 2;
 		this.particleDensityZ = (claim.maxZ - claim.minZ) / 2;
 	}
 
-
 	private void drawLineX(int x, int y, int z) {
-		player.spawnParticle(Particle.REDSTONE, x, y, z, particleDensityX, particleDensityX / 2.f, 0, 0, options);
+		player.spawnParticle(PARTICLE, x, y, z, particleDensityX / 2, particleDensityX / 2., 0, 0, options);
 	}
 
 	private void drawLineY(int x, int y, int z) {
-		player.spawnParticle(Particle.REDSTONE, x, y, z, particleDensityY, 0, particleDensityY / 2.f, 0, options);
+		player.spawnParticle(PARTICLE, x, y, z, particleDensityY / 3, 0, particleDensityY / 3.f, 0, options);
+		player.spawnParticle(PARTICLE, x, this.player.getLocation().getY(), z, 20, 0, 10, 0, options);
 	}
 
 	private void drawLineZ(int x, int y, int z) {
-		player.spawnParticle(Particle.REDSTONE, x, y, z, particleDensityZ, 0, 0, particleDensityZ / 2.f, options);
+		player.spawnParticle(PARTICLE, x, y, z, particleDensityZ, 0, 0, particleDensityZ / 3.f, options);
 	}
 
 	@Override
@@ -59,5 +60,12 @@ public class ClaimVisualizationTask implements Runnable {
 		drawLineX(claim.minX + particleDensityX, claim.maxY, claim.maxZ + 1);
 		drawLineZ(claim.minX, claim.maxY, claim.minZ + particleDensityZ);
 		drawLineZ(claim.maxX + 1, claim.maxY, claim.minZ + particleDensityZ);
+
+		// Draw a line at the player's head position
+		final var playerY = (int) player.getLocation().getY() + 1;
+		drawLineX(claim.minX + particleDensityX, playerY, claim.minZ);
+		drawLineX(claim.minX + particleDensityX, playerY, claim.maxZ + 1);
+		drawLineZ(claim.minX, playerY, claim.minZ + particleDensityZ);
+		drawLineZ(claim.maxX + 1, playerY, claim.minZ + particleDensityZ);
 	}
 }
