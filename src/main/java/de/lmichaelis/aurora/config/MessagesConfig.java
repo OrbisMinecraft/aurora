@@ -35,4 +35,5 @@ public final class MessagesConfig {
 
 	public String leaveAdminMode = "§aYou've left administrative mode.";
 	public String enterAdminMode = "§aYou've entered administrative mode.";
+	public String creatingAdminClaim = "§aYou'll be creating an admin claim.";
 }
