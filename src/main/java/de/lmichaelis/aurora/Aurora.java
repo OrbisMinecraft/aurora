@@ -6,6 +6,7 @@ import de.lmichaelis.aurora.command.AuroraReloadCommand;
 import de.lmichaelis.aurora.command.AuroraRootCommand;
 import de.lmichaelis.aurora.config.AuroraConfig;
 import de.lmichaelis.aurora.listener.*;
+import de.lmichaelis.aurora.task.AccrueClaimBlocksTask;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
@@ -27,12 +28,13 @@ public final class Aurora extends JavaPlugin {
 
 	private BaseListener[] listeners;
 	private AuroraRootCommand command;
+	private Integer accrueClaimBlocksTaskId = null;
 
 	public Aurora() {
 		super();
 	}
 
-	protected Aurora(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
+	Aurora(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
 		super(loader, description, dataFolder, file);
 	}
 
@@ -77,6 +79,17 @@ public final class Aurora extends JavaPlugin {
 			Aurora.db = new Database(config.databaseUri);
 		} catch (SQLException | IOException e) {
 			throw new IllegalStateException("Failed to connect to the database", e);
+		}
+
+		// Start the task to add claim blocks to every online player every 5 minutes
+		if (accrueClaimBlocksTaskId != null) this.getServer().getScheduler().cancelTask(this.accrueClaimBlocksTaskId);
+		if (config.accrueClaimBlockEnabled && config.accrueClaimBlocksPerHour > 0) {
+			accrueClaimBlocksTaskId = this.getServer().getScheduler().scheduleSyncRepeatingTask(
+					this,
+					new AccrueClaimBlocksTask(config.accrueClaimBlocksPerHour, config.accrueClaimBlocksLimit),
+					20 * 60 * 5,
+					20 * 60 * 5
+			);
 		}
 
 		if (listeners == null) {
