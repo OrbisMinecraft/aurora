@@ -9,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -69,6 +70,22 @@ public final class BlockEventListener extends BaseListener {
 		}
 
 		// Rule: Inside claims, players need the build permission to place blocks
+		if (claim.isAllowed(player, Group.BUILD)) return;
+
+		player.sendMessage(plugin.config.messages.noPermission);
+		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onBlockBreak(final @NotNull BlockBreakEvent event) {
+		final var player = event.getPlayer();
+		final var block = event.getBlock();
+		final var claim = Claim.getClaim(block.getLocation());
+
+		// Rule: Blocks can be broken everywhere outside of claims
+		if (claim == null) return;
+
+		// Rule: Only players with the BUILD group can break blocks inside claims
 		if (claim.isAllowed(player, Group.BUILD)) return;
 
 		player.sendMessage(plugin.config.messages.noPermission);
