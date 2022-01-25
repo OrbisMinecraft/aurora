@@ -11,6 +11,28 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 
 public final class Interactions {
+	public static void showClaimBoundaries(final @NotNull Aurora plugin, final @NotNull Player player,
+										   final @NotNull Claim claim) {
+		final var user = User.fromMetadata(player);
+		assert user != null;
+
+		// Only run at most three visualization tasks
+		if (user.runningVisualizationTasks >= 3) return;
+
+		final var visTask = Bukkit.getScheduler().runTaskTimer(
+				plugin,
+				new ClaimVisualizationTask(claim, player, Color.RED),
+				0, 5
+		);
+
+		Bukkit.getScheduler().runTaskLater(plugin, () -> {
+			Bukkit.getScheduler().cancelTask(visTask.getTaskId());
+			user.runningVisualizationTasks -= 1;
+		}, 20 * 20);
+
+		user.runningVisualizationTasks += 1;
+	}
+
 	public static void onAuroraInteract(final Aurora plugin, final @NotNull Player player, final @NotNull Material tool) {
 		final var rayTraceResult = player.rayTraceBlocks(100, FluidCollisionMode.SOURCE_ONLY);
 
@@ -67,7 +89,11 @@ public final class Interactions {
 
 			previousLocation.setY(previousLocation.getWorld().getMinHeight());
 			targetedLocation.setY(targetedLocation.getWorld().getMaxHeight());
-			new Claim(player.getUniqueId(), "test", previousLocation, targetedLocation).save();
+
+			final var claim = new Claim(player.getUniqueId(), "test", previousLocation, targetedLocation);
+			claim.save();
+
+			showClaimBoundaries(plugin, player, claim);
 		} else {
 			// Feature: Inspect a claim.
 			if (targetedClaim == null) {
@@ -79,24 +105,7 @@ public final class Interactions {
 					Bukkit.getOfflinePlayer(targetedClaim.owner).getName())
 			);
 
-			final var user = User.fromMetadata(player);
-			assert user != null;
-
-			// Only run at most three visualization tasks
-			if (user.runningVisualizationTasks >= 3) return;
-
-			final var visTask = Bukkit.getScheduler().runTaskTimer(
-					plugin,
-					new ClaimVisualizationTask(targetedClaim, player, Color.RED),
-					0, 5
-			);
-
-			Bukkit.getScheduler().runTaskLater(plugin, () -> {
-				Bukkit.getScheduler().cancelTask(visTask.getTaskId());
-				user.runningVisualizationTasks -= 1;
-			}, 20 * 20);
-
-			user.runningVisualizationTasks += 1;
+			showClaimBoundaries(plugin, player, targetedClaim);
 		}
 	}
 }
