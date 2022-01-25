@@ -8,6 +8,7 @@ import de.lmichaelis.aurora.model.Claim;
 import de.lmichaelis.aurora.model.Group;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.*;
@@ -222,6 +223,28 @@ public final class BlockEventListener extends BaseListener {
 		// Rule: Don't allow any blocks to be destroyed by fire inside claims.
 		// TODO: Add claim config option?
 		if (claim == null) return;
+		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onBlockDispense(final @NotNull BlockDispenseEvent event) {
+		final var source = event.getBlock();
+
+		// Ignore everything but dispensers
+		if (!(source.getBlockData() instanceof final Dispenser dispenser)) return;
+
+		final var target = source.getRelative(dispenser.getFacing());
+		final var targetClaim = Claim.getClaim(target.getLocation());
+
+		// Rule: Dispensing into the wild is always allowed
+		if (targetClaim == null) return;
+
+		// Rule: Dispensing into the same claim is allowed
+		if (targetClaim.contains(source.getLocation())) return;
+
+		final var sourceClaim = Claim.getClaim(source.getLocation());
+		if (sourceClaim != null && Objects.equals(sourceClaim.owner, targetClaim.owner)) return;
+
 		event.setCancelled(true);
 	}
 }
