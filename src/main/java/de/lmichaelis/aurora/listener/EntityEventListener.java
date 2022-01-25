@@ -13,6 +13,8 @@ import org.bukkit.event.entity.*;
 import org.bukkit.projectiles.BlockProjectileSource;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * Event handlers for entity events.
  */
@@ -82,7 +84,7 @@ public final class EntityEventListener extends BaseListener {
 			// Rule: Allow all damage from non-player projectiles originating from a dispenser inside the claim
 			if (projectile.getShooter() instanceof final BlockProjectileSource source) {
 				final var sourceClaim = Claim.getClaim(source.getBlock().getLocation());
-				if (sourceClaim != null && sourceClaim.owner == claim.owner) return;
+				if (sourceClaim != null && Objects.equals(sourceClaim.owner, claim.owner)) return;
 			}
 		}
 
