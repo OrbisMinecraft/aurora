@@ -74,7 +74,12 @@ public final class Interactions {
 					Bukkit.getOfflinePlayer(targetedClaim.owner).getName())
 			);
 
-			// TODO: prevent multiple tasks per claim per player
+			final var user = User.fromMetadata(player);
+			assert user != null;
+
+			// Only run at most three visualization tasks
+			if (user.runningVisualizationTasks >= 3) return;
+
 			final var visTask = Bukkit.getScheduler().runTaskTimer(
 					plugin,
 					new ClaimVisualizationTask(targetedClaim, player, Color.RED),
@@ -83,7 +88,10 @@ public final class Interactions {
 
 			Bukkit.getScheduler().runTaskLater(plugin, () -> {
 				Bukkit.getScheduler().cancelTask(visTask.getTaskId());
+				user.runningVisualizationTasks -= 1;
 			}, 20 * 20);
+
+			user.runningVisualizationTasks += 1;
 		}
 	}
 }
