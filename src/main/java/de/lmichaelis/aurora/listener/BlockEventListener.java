@@ -214,4 +214,14 @@ public final class BlockEventListener extends BaseListener {
 		player.sendMessage(plugin.config.messages.noPermission);
 		event.setCancelled(true);
 	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onBlockBurn(final @NotNull BlockBurnEvent event) {
+		final var claim = Claim.getClaim(event.getBlock().getLocation());
+
+		// Rule: Don't allow any blocks to be destroyed by fire inside claims.
+		// TODO: Add claim config option?
+		if (claim == null) return;
+		event.setCancelled(true);
+	}
 }
