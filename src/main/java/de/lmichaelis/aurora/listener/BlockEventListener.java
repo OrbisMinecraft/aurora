@@ -10,10 +10,12 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
+import java.util.Objects;
 
 /**
  * Event handlers for block events.
@@ -89,6 +91,24 @@ public final class BlockEventListener extends BaseListener {
 		if (claim.isAllowed(player, Group.BUILD)) return;
 
 		player.sendMessage(plugin.config.messages.noPermission);
+		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onBlockFromTo(final @NotNull BlockFromToEvent event) {
+		final var to = event.getToBlock();
+		final var from = event.getBlock();
+
+		final var toClaim = Claim.getClaim(to.getLocation());
+
+		// Rule: Blocks can always move into unclaimed land
+		if (toClaim == null) return;
+
+		final var fromClaim = Claim.getClaim(from.getLocation());
+
+		// Rule: Blocks can move into claims of the same owner
+		if (fromClaim != null && Objects.equals(fromClaim.owner, toClaim.owner)) return;
+
 		event.setCancelled(true);
 	}
 }
