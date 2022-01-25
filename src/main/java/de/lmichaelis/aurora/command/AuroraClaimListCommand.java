@@ -34,7 +34,7 @@ public class AuroraClaimListCommand extends AuroraBaseCommand {
 				return true;
 			}
 
-			final var targetedPlayer = plugin.getServer().getOfflinePlayerIfCached(args[0]);
+			var targetedPlayer =  player.getServer().getOfflinePlayerIfCached(args[1]);
 			if (targetedPlayer == null) {
 				player.sendMessage(plugin.config.messages.unknownPlayer);
 				return true;
