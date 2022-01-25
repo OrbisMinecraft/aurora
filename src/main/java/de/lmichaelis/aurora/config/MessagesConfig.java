@@ -10,7 +10,7 @@ public final class MessagesConfig {
 	public String notAClaim = "§cThere is no claim here.";
 	public String alreadyClaimed = "§cThere is already a claim here.";
 	public String blockClaimedBy = "§cThis block is claimed by %s.";
-	public String claimCornerSet = "§aFirst claim corner set.";
+	public String claimCornerSet = "§aFirst claim corner set (%d, %d, %d).";
 	public String needMoreClaimBlocks = "§cYou need %d more claim blocks to be able to claim this area.";
 	public String wouldOverlapAnotherClaim = "§cYou can't create a claim here because it would overlap another one.";
 	public String claimCreated = "§aClaim created (%d x %d blocks). You have %d claim blocks left.";

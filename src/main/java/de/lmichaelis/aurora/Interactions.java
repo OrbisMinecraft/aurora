@@ -71,7 +71,11 @@ public final class Interactions {
 			}
 
 			if (previousLocationMeta.size() == 0) {
-				player.sendMessage(plugin.config.messages.claimCornerSet);
+				player.sendMessage(plugin.config.messages.claimCornerSet.formatted(
+						targetedLocation.getBlockX(),
+						targetedLocation.getBlockY(),
+						targetedLocation.getBlockZ()
+				));
 				player.setMetadata("aurora.claimBlockSelection", new FixedMetadataValue(plugin, targetedLocation));
 				return;
 			}

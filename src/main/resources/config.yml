@@ -11,7 +11,7 @@ messages:
   notAClaim: "§cThere is no claim here."
   alreadyClaimed: "§cThere is already a claim here."
   blockClaimedBy: "§cThis block is claimed by %s."
-  claimCornerSet: '§aFirst claim corner set.'
+  claimCornerSet: '§aFirst claim corner set (%d, %d, %d).'
   needMoreClaimBlocks: '§cYou need %d more claim blocks to be able to claim this area.'
   wouldOverlapAnotherClaim: "§cYou can't create a claim here because it would overlap another one."
   claimCreated: "§aClaim created (%d x %d blocks). You have %d claim blocks left."
@@ -23,7 +23,7 @@ messages:
   noClaimCreationPermission: "§cYou don't have permission to create claims."
   notClaimOwner: "§cYou cannot do this because you are not an owner of this claim."
   claimDeleted: "§aClaim deleted."
-  claimDeletedByOwner: "§aClaim deleted. You have %d claim blocks left.";
+  claimDeletedByOwner: "§aClaim deleted. You have %d claim blocks left."
   unknownPlayer: "§cI've never seen a player by that name."
   cannotSetOwnGroup: "§cYou can't change your own group."
   tooManyClaims: "§cYou can't create any more claims."
