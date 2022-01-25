@@ -62,6 +62,8 @@ public final class Interactions {
 			user.refresh();
 
 			final var isAdminClaiming = user.adminMode && player.hasPermission("aurora.admin.claims");
+			if (isAdminClaiming) player.sendMessage(plugin.config.messages.creatingAdminClaim);
+
 
 			if (plugin.config.totalClaimsLimit > 0 && user.totalClaimsUsed >= plugin.config.totalClaimsLimit && !isAdminClaiming) {
 				player.sendMessage(plugin.config.messages.tooManyClaims);

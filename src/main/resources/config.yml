@@ -36,3 +36,4 @@ messages:
 
   leaveAdminMode: "§aYou've left administrative mode."
   enterAdminMode: "§aYou've entered administrative mode."
+  creatingAdminClaim: "§aYou'll be creating an admin claim."
