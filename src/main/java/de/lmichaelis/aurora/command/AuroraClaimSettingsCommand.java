@@ -11,13 +11,16 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AuroraClaimSettingsCommand extends AuroraBaseCommand {
 	public static final List<String> VARIABLES = List.of(
 			"pvp",
 			"mobGriefing",
-			"explosions"
+			"explosions",
+			"name"
 	);
 
 	public AuroraClaimSettingsCommand(Aurora plugin) {
@@ -55,6 +58,10 @@ public class AuroraClaimSettingsCommand extends AuroraBaseCommand {
 					claim.allowsExplosions = enabled;
 					player.sendMessage((enabled ? "Enabled" : "Disabled") + " explosions in this claim.");
 				}
+				case "name" -> {
+					claim.name = Arrays.stream(args).skip(2).collect(Collectors.joining(" "));
+					player.sendMessage("Set this claim's name to '" + claim.name + "'");
+				}
 				default -> {
 					return false;
 				}
@@ -68,6 +75,6 @@ public class AuroraClaimSettingsCommand extends AuroraBaseCommand {
 
 	@Override
 	public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-		return args.length < 3 ? VARIABLES : List.of("on", "off");
+		return args.length < 3 ? VARIABLES : (args[1].equals("name") ? List.of() : List.of("on", "off"));
 	}
 }
