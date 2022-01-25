@@ -31,6 +31,9 @@ public final class User {
 	@DatabaseField(canBeNull = false)
 	public int usedClaimBlocks = 0;
 
+	@DatabaseField(canBeNull = false)
+	public int totalClaimsUsed = 0;
+
 	// Temporary, non-persistent data
 	public int runningVisualizationTasks = 0;
 

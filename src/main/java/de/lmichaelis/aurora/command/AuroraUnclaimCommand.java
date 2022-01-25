@@ -40,6 +40,7 @@ public class AuroraUnclaimCommand extends AuroraBaseCommand {
 			assert actualOwner != null;
 
 			actualOwner.usedClaimBlocks -= claim.size();
+			actualOwner.totalClaimsUsed -= 1;
 			actualOwner.update();
 
 			player.sendMessage(plugin.config.messages.claimDeleted.formatted(
