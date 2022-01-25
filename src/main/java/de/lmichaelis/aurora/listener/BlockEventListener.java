@@ -10,10 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockExplodeEvent;
-import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
@@ -117,5 +114,32 @@ public final class BlockEventListener extends BaseListener {
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockExplode(final @NotNull BlockExplodeEvent event) {
 		AuroraUtil.neutralizeExplosion(event.blockList());
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onPistonRetract(final @NotNull BlockPistonRetractEvent event) {
+		final var affected = event.getBlocks();
+		final var piston = event.getBlock();
+
+		// Rule: Pistons that are not pulling any blocks can always retract
+		if (affected.isEmpty()) return;
+
+		final var claim = Claim.getClaim(piston.getLocation());
+
+		// Rule: If all blocks are in the same claim as the piston it is allowed to retract
+		if (claim != null) {
+			if (affected.stream().allMatch(b -> claim.contains(b.getLocation()))) return;
+		}
+
+		// Rule: Pistons can move any block within claims of the same owner and they can
+		//       move blocks outside of claims
+		if (affected.stream().allMatch(b -> {
+			if (claim != null && claim.contains(b.getLocation())) return true;
+
+			final var otherClaim = Claim.getClaim(b.getLocation());
+			return otherClaim == null || (claim != null && Objects.equals(claim.owner, otherClaim.owner));
+		})) return;
+
+		event.setCancelled(true);
 	}
 }
