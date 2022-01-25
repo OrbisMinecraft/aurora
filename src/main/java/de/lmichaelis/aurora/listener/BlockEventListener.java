@@ -177,4 +177,28 @@ public final class BlockEventListener extends BaseListener {
 
 		event.setCancelled(true);
 	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onBlockSpread(final @NotNull BlockSpreadEvent event) {
+		final var block = event.getBlock();
+		final var source = event.getSource();
+
+		// We only care about fire here
+		if (source.getType() != Material.FIRE) return;
+
+		final var targetClaim = Claim.getClaim(block.getLocation());
+
+		// Rule: Fire can always spread outside of claims
+		if (targetClaim == null) return;
+
+		// Rule: Fire can only spread within the same claim
+		if (targetClaim.contains(source.getLocation())) return;
+
+		final var sourceClaim = Claim.getClaim(source.getLocation());
+		if (sourceClaim != null && Objects.equals(sourceClaim.owner, targetClaim.owner)) return;
+
+		// Extinguish fire that is not placed on netherrack. This behaviour is copied from GriefPrevention
+		if (source.getRelative(BlockFace.DOWN).getType() != Material.NETHERRACK) source.setType(Material.AIR);
+		event.setCancelled(true);
+	}
 }
