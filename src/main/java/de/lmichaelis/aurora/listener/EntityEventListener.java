@@ -98,8 +98,9 @@ public final class EntityEventListener extends BaseListener {
 		}
 
 		// Rule: Only allow the lingering effect to damage players within PvP-enabled claims
-		if (damager.getType() == EntityType.AREA_EFFECT_CLOUD && entity.getType() == EntityType.PLAYER) {
-			if (!claim.pvpEnabled) event.setCancelled(true);
+		if (damager.getType() == EntityType.AREA_EFFECT_CLOUD) {
+			if ((entity.getType() == EntityType.PLAYER && !claim.pvpEnabled) || Predicates.isProtectedEntity(entity))
+				event.setCancelled(true);
 			return;
 		}
 
