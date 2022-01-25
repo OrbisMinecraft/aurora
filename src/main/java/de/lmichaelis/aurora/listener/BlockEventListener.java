@@ -201,4 +201,17 @@ public final class BlockEventListener extends BaseListener {
 		if (source.getRelative(BlockFace.DOWN).getType() != Material.NETHERRACK) source.setType(Material.AIR);
 		event.setCancelled(true);
 	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onBlockPlaceMulti(final @NotNull BlockMultiPlaceEvent event) {
+		final var player = event.getPlayer();
+
+		if (event.getReplacedBlockStates().stream().allMatch(b -> {
+			final var claim = Claim.getClaim(b.getLocation());
+			return claim == null || claim.isAllowed(player, Group.BUILD);
+		})) return;
+
+		player.sendMessage(plugin.config.messages.noPermission);
+		event.setCancelled(true);
+	}
 }
