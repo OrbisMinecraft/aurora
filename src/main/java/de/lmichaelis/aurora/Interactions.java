@@ -81,7 +81,7 @@ public final class Interactions {
 				return;
 			}
 
-			player.sendMessage(plugin.config.messages.claimCreated.formatted(sizeX, sizeZ));
+			player.sendMessage(plugin.config.messages.claimCreated.formatted(sizeX, sizeZ, remainingClaimBlocks - (sizeX * sizeZ)));
 			player.removeMetadata("aurora.claimBlockSelection", plugin);
 
 			user.usedClaimBlocks += sizeX * sizeZ;

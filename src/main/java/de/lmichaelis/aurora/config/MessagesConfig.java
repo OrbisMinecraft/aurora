@@ -13,7 +13,7 @@ public final class MessagesConfig {
 	public String claimCornerSet = "§aFirst claim corner set.";
 	public String needMoreClaimBlocks = "§cYou need %d more claim blocks to be able to claim this area.";
 	public String wouldOverlapAnotherClaim = "§cYou can't create a claim here because it would overlap another one.";
-	public String claimCreated = "§aClaim created (%d x %d blocks).";
+	public String claimCreated = "§aClaim created (%d x %d blocks). You have %d claim blocks left.";
 	public String claimResized = "§aClaim resized (%d x %d blocks).";
 	public String resizingClaim = "§aResizing claim.";
 	public String noPermission = "§cYou don't have permission to do that here.";

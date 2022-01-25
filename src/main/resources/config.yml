@@ -13,7 +13,7 @@ messages:
   claimCornerSet: '§aFirst claim corner set.'
   needMoreClaimBlocks: '§cYou need %d more claim blocks to be able to claim this area.'
   wouldOverlapAnotherClaim: "§cYou can't create a claim here because it would overlap another one."
-  claimCreated: "§aClaim created (%d x %d blocks)."
+  claimCreated: "§aClaim created (%d x %d blocks). You have %d claim blocks left."
   claimResized: "§aClaim resized (%d x %d blocks)."
   resizingClaim: "§aResizing claim."
   noPermission: "§cYou don't have permission to do that here."
