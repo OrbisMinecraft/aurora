@@ -142,4 +142,39 @@ public final class BlockEventListener extends BaseListener {
 
 		event.setCancelled(true);
 	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onPistonExtend(final @NotNull BlockPistonExtendEvent event) {
+		final var affected = event.getBlocks();
+		final var piston = event.getBlock();
+		final var claim = Claim.getClaim(piston.getLocation());
+
+		// Rule: Pistons cannot push into a claim (even without attached blocks).
+		if (affected.isEmpty()) {
+			final var relativeBlock = piston.getRelative(event.getDirection());
+			final var relativeClaim = Claim.getClaim(relativeBlock.getLocation());
+
+			if ((claim == null && relativeClaim != null) ||
+					(relativeClaim != null && !Objects.equals(claim.owner, relativeClaim.owner)))
+				event.setCancelled(true);
+			return;
+		}
+
+		// Rule: If all blocks are in the same claim as the piston it is allowed to extend
+		if (claim != null) {
+			if (affected.stream().allMatch(b -> claim.contains(b.getRelative(event.getDirection()).getLocation()))) return;
+		}
+
+		// Rule: Pistons can move any block within claims of the same owner, and they can
+		//       move blocks outside of claims
+		if (affected.stream().allMatch(b -> {
+			final var relative = b.getRelative(event.getDirection());
+			if (claim != null && claim.contains(relative.getLocation())) return true;
+
+			final var otherClaim = Claim.getClaim(relative.getLocation());
+			return otherClaim == null || (claim != null && Objects.equals(claim.owner, otherClaim.owner));
+		})) return;
+
+		event.setCancelled(true);
+	}
 }
