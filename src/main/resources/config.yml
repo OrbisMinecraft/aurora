@@ -22,7 +22,8 @@ messages:
   pvpDisabled: "§cPvP is disabled in this claim."
   noClaimCreationPermission: "§cYou don't have permission to create claims."
   notClaimOwner: "§cYou cannot do this because you are not an owner of this claim."
-  claimDeleted: "§aClaim deleted. You have %d claim blocks left."
+  claimDeleted: "§aClaim deleted."
+  claimDeletedByOwner: "§aClaim deleted. You have %d claim blocks left.";
   unknownPlayer: "§cI've never seen a player by that name."
   cannotSetOwnGroup: "§cYou can't change your own group."
   tooManyClaims: "§cYou can't create any more claims."

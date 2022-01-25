@@ -21,7 +21,8 @@ public final class MessagesConfig {
 	public String pvpDisabled = "§cPvP is disabled in this claim.";
 	public String noClaimCreationPermission = "§cYou don't have permission to create claims.";
 	public String notClaimOwner = "§cYou cannot do this because you are not the owner of this claim.";
-	public String claimDeleted = "§aClaim deleted. You have %d claim blocks left.";
+	public String claimDeleted = "§aClaim deleted.";
+	public String claimDeletedByOwner = "§aClaim deleted. You have %d claim blocks left.";
 	public String unknownPlayer = "§cI've never seen a player by that name.";
 	public String cannotSetOwnGroup = "§cYou can't change your own group.";
 	public String tooManyClaims = "§cYou can't create any more claims.";

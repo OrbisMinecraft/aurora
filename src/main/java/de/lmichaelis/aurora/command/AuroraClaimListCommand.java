@@ -47,6 +47,7 @@ public class AuroraClaimListCommand extends AuroraBaseCommand {
 		}
 
 		assert user != null;
+		user.refresh();
 		final var claims = user.getClaims();
 
 		player.sendMessage(plugin.config.messages.claimListHeader);
