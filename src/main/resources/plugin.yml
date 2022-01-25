@@ -16,5 +16,10 @@ permissions:
     default: op
   aurora.claims:
     description: "Permission required to create and delete your own claims."
+    default: true
   aurora.claims.other:
     description: "Permission required to list and delete other's claims."
+    default: op
+  aurora.admin:
+    description: "Permission required to create and manage administrative claims."
+    default: op

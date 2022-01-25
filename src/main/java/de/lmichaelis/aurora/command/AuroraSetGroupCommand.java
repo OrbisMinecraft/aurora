@@ -5,6 +5,7 @@ package de.lmichaelis.aurora.command;
 import de.lmichaelis.aurora.Aurora;
 import de.lmichaelis.aurora.model.Claim;
 import de.lmichaelis.aurora.model.Group;
+import de.lmichaelis.aurora.model.User;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -39,6 +40,7 @@ public class AuroraSetGroupCommand extends AuroraBaseCommand {
 		if (!(sender instanceof final Player player)) return false;
 		if (args.length != 3) return false;
 		final var claim = Claim.getClaim(player.getLocation());
+		final var user = Objects.requireNonNull(User.fromMetadata(player));
 
 		if (claim == null) {
 			player.sendMessage(plugin.config.messages.notAClaim);
@@ -46,9 +48,9 @@ public class AuroraSetGroupCommand extends AuroraBaseCommand {
 			player.sendMessage(plugin.config.messages.noPermission);
 		} else if (args[2].equals("manage") && !claim.isAllowed(player, Group.OWNER)) {
 			player.sendMessage(plugin.config.messages.noPermission);
-		} else if (args[2].equals("owner") && !Objects.equals(player.getUniqueId(), claim.owner)) {
+		} else if (args[2].equals("owner") && !Objects.equals(player.getUniqueId(), claim.owner) && !user.adminMode) {
 			player.sendMessage(plugin.config.messages.noPermission);
-		}else if (player.getName().equals(args[1])) {
+		} else if (player.getName().equals(args[1])) {
 			player.sendMessage(plugin.config.messages.cannotSetOwnGroup);
 		} else {
 			OfflinePlayer target = plugin.getServer().getPlayer(args[1]);
