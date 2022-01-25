@@ -2,10 +2,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 package de.lmichaelis.aurora;
 
-import de.lmichaelis.aurora.command.AuroraClaimListCommand;
-import de.lmichaelis.aurora.command.AuroraReloadCommand;
-import de.lmichaelis.aurora.command.AuroraUnclaimCommand;
-import de.lmichaelis.aurora.command.AuroraRootCommand;
+import de.lmichaelis.aurora.command.*;
 import de.lmichaelis.aurora.config.AuroraConfig;
 import de.lmichaelis.aurora.listener.*;
 import de.lmichaelis.aurora.task.AccrueClaimBlocksTask;
@@ -51,6 +48,7 @@ public final class Aurora extends JavaPlugin {
 		this.command.addSubCommand("reload", new AuroraReloadCommand(this));
 		this.command.addSubCommand("unclaim", new AuroraUnclaimCommand(this));
 		this.command.addSubCommand("claimlist", new AuroraClaimListCommand(this));
+		this.command.addSubCommand("set-group", new AuroraSetGroupCommand(this));
 
 		final var rootCommand = this.getCommand("aurora");
 		assert rootCommand != null;

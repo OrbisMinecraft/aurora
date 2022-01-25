@@ -23,6 +23,7 @@ public final class MessagesConfig {
 	public String notClaimOwner = "§cYou cannot do this because you are not the owner of this claim.";
 	public String claimDeleted = "§aClaim deleted. You have %d claim blocks left.";
 	public String unknownPlayer = "§cI've never seen a player by that name.";
+	public String cannotSetOwnGroup = "§cYou can't change your own group.";
 
 	public String claimListHeader = "These are your claims:";
 	public String claimListEntry = "§7- %s at (%d, %d); %d blocks";
