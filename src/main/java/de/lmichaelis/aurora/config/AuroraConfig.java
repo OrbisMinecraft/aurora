@@ -20,6 +20,9 @@ public final class AuroraConfig {
 	public Material claimCreationTool = Material.GOLDEN_SHOVEL;
 	public Material claimInvestigationTool = Material.STICK;
 	public MessagesConfig messages = new MessagesConfig();
+	public boolean accrueClaimBlockEnabled = true;
+	public int accrueClaimBlocksPerHour = 100;
+	public int accrueClaimBlocksLimit = 10000;
 
 	/**
 	 * Loads the configuration from a file.

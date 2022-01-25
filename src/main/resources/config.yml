@@ -2,6 +2,9 @@ databaseUri: 'jdbc:h2:./plugins/Aurora/aurora'
 initialClaimBlocks: 1000
 claimCreationTool: 'GOLDEN_SHOVEL'
 claimInvestigationTool: 'STICK'
+accrueClaimBlockEnabled: true
+accrueClaimBlocksPerHour: 100
+accrueClaimBlocksLimit: 10000
 messages:
   tooFarAway: "§cThat's too far away!"
   notAClaim: "§cThere is no claim here."
