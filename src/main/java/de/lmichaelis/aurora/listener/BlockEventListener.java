@@ -12,9 +12,11 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.block.*;
+import org.bukkit.projectiles.BlockProjectileSource;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
@@ -263,6 +265,40 @@ public final class BlockEventListener extends BaseListener {
 
 		// Rule: If inside a claim, frost walker can only be used by player with the BUILD permission
 		if (claim.isAllowed((Player) event.getEntity(), Group.BUILD)) return;
+
+		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onBlockIgnite(final @NotNull BlockIgniteEvent event) {
+		final var cause = event.getCause();
+		final var block = event.getBlock();
+		final var claim = Claim.getClaim(block.getLocation());
+
+		// Rule: Blocks can always be ignited outside of claims
+		if (claim == null) return;
+
+		if (cause == BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL && event.getIgnitingBlock() != null) {
+			// Rule: Allow dispensers to use flint and steel in the same claim or a claim with the same owner
+			final var igniter = event.getIgnitingBlock();
+			if (claim.contains(igniter.getLocation())) return;
+
+			final var igniterClaim = Claim.getClaim(igniter.getLocation());
+			if (igniterClaim != null && Objects.equals(igniterClaim.owner, claim.owner)) return;
+		} else if (event.getIgnitingEntity() instanceof final Fireball fireball) {
+			// Rule: Allow dispensers to use a fireball in the same claim or a claim with the same owner
+			final var igniter = fireball.getShooter();
+
+			if (igniter instanceof final BlockProjectileSource source) {
+				if (claim.contains(source.getBlock().getLocation())) return;
+
+				final var igniterClaim = Claim.getClaim(source.getBlock().getLocation());
+				if (igniterClaim != null && Objects.equals(igniterClaim.owner, claim.owner)) return;
+			}
+		} else if (event.getIgnitingEntity() instanceof final Player player) {
+			// Rule: Allow players to ignite all blocks within claims they have the BUILD group in
+			if (claim.isAllowed(player, Group.BUILD)) return;
+		}
 
 		event.setCancelled(true);
 	}
