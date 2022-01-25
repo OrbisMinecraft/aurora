@@ -22,4 +22,10 @@ public final class MessagesConfig {
 	public String noClaimCreationPermission = "§cYou don't have permission to create claims.";
 	public String notClaimOwner = "§cYou cannot do this because you are not the owner of this claim.";
 	public String claimDeleted = "§aClaim deleted. You have %d claim blocks left.";
+	public String unknownPlayer = "§cI've never seen a player by that name.";
+
+	public String claimListHeader = "These are your claims:";
+	public String claimListEntry = "§7- %s at (%d, %d); %d blocks";
+	public String claimListFooter = "You have used %d of your %d claim blocks. That means you have §a%d claim blocks remaining";
+	public String claimListEmpty = "   You haven't created any claims yet.";
 }

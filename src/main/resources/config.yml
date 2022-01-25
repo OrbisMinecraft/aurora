@@ -22,3 +22,9 @@ messages:
   noClaimCreationPermission: "§cYou don't have permission to create claims."
   notClaimOwner: "§cYou cannot do this because you are not an owner of this claim."
   claimDeleted: "§aClaim deleted. You have %d claim blocks left."
+  unknownPlayer: "§cI've never seen a player by that name."
+
+  claimListHeader: "These are your claims:"
+  claimListEntry: "§2- %s at (%d, %d); %d blocks"
+  claimListFooter: "You have used %d of your %d claim blocks. That means you have §a%d claim blocks remaining"
+  claimListEmpty: "   You haven't created any claims yet."

@@ -90,7 +90,7 @@ public final class Interactions {
 			previousLocation.setY(previousLocation.getWorld().getMinHeight());
 			targetedLocation.setY(targetedLocation.getWorld().getMaxHeight());
 
-			final var claim = new Claim(player.getUniqueId(), "test", previousLocation, targetedLocation);
+			final var claim = new Claim(player.getUniqueId(), "(unnamed)", previousLocation, targetedLocation);
 			claim.save();
 
 			showClaimBoundaries(plugin, player, claim);

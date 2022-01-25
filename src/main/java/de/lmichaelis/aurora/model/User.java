@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -42,6 +43,30 @@ public final class User {
 	protected User() {
 	}
 
+	public static @Nullable User get(final UUID id) {
+		try {
+			return Aurora.db.users.queryForId(id);
+		} catch (SQLException e) {
+			Aurora.logger.severe("Failed to get user (%s): %s".formatted(id, e));
+			return null;
+		}
+	}
+
+	public static @Nullable User fromMetadata(final @NotNull Player player) {
+		return AuroraUtil.getScalarMetadata(METADATA_KEY, player);
+	}
+
+	public @NotNull List<Claim> getClaims() {
+		try {
+			return Aurora.db.claims.queryBuilder().where()
+					.eq("owner", this.id)
+					.query();
+		} catch (SQLException e) {
+			Aurora.logger.severe("Failed to get user's claims (%s): %s".formatted(id, e));
+			return List.of();
+		}
+	}
+
 	public boolean update() {
 		try {
 			Aurora.db.users.update(this);
@@ -60,18 +85,5 @@ public final class User {
 			Aurora.logger.severe("Failed to create user (%s): %s".formatted(id, e));
 			return false;
 		}
-	}
-
-	public static @Nullable User get(final UUID id) {
-		try {
-			return Aurora.db.users.queryForId(id);
-		} catch (SQLException e) {
-			Aurora.logger.severe("Failed to get user (%s): %s".formatted(id, e));
-			return null;
-		}
-	}
-
-	public static @Nullable User fromMetadata(final @NotNull Player player) {
-		return AuroraUtil.getScalarMetadata(METADATA_KEY, player);
 	}
 }

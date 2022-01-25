@@ -4,7 +4,8 @@
 
 ### Permissions
 
-| Permission      | Description                                    |
-|-----------------|------------------------------------------------|
-| `aurora.reload` | Permission to reload Aurora completely         |
-| `aurora.claims` | Permission to create and manage normal claims  |
+| Permission             | Description                                                                    |
+|------------------------|--------------------------------------------------------------------------------|
+| `aurora.reload`        | Permission to reload Aurora completely                                         |
+| `aurora.claims`        | Permission to create and manage normal claims                                  |
+| `aurora.claims.other`  | Permission to list and manage other player's claims ignoring the group system. |
