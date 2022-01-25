@@ -61,16 +61,18 @@ public class AuroraSetGroupCommand extends AuroraBaseCommand {
 			}
 
 			switch (args[2]) {
-				case "remove" -> claim.setGroup(player, Group.NONE);
-				case "access" -> claim.setGroup(player, Group.ACCESS);
-				case "steal" -> claim.setGroup(player, Group.STEAL);
-				case "build" -> claim.setGroup(player, Group.BUILD);
-				case "manage" -> claim.setGroup(player, Group.MANAGE);
-				case "owner" -> claim.setGroup(player, Group.OWNER);
+				case "remove" -> claim.setGroup(target, Group.NONE);
+				case "access" -> claim.setGroup(target, Group.ACCESS);
+				case "steal" -> claim.setGroup(target, Group.STEAL);
+				case "build" -> claim.setGroup(target, Group.BUILD);
+				case "manage" -> claim.setGroup(target, Group.MANAGE);
+				case "owner" -> claim.setGroup(target, Group.OWNER);
 				default -> {
 					return false;
 				}
 			}
+
+			player.sendMessage("§cGranted permission " + args[2] + " to " + args[1]);
 		}
 
 		return true;

@@ -244,18 +244,18 @@ public final class Claim {
 	 * @param group  The group to set.
 	 */
 	public boolean setGroup(final @NotNull OfflinePlayer player, final Group group) {
-		var userGroup = userGroupById.getOrDefault(player.getUniqueId(), null);
-
 		try {
-			if (userGroup != null) {
-				userGroup.group = group;
-				Aurora.db.userGroups.update(userGroup);
-			} else {
-				userGroup = new UserGroup(this, player.getUniqueId(), group);
-				Aurora.db.userGroups.create(userGroup);
-				Aurora.db.claims.refresh(this);
-				this.userGroupById.put(player.getUniqueId(), userGroup);
+			for (final var gr : this.userGroups) {
+				if (gr.player.equals(player.getUniqueId())) {
+					gr.group = group;
+					Aurora.db.userGroups.update(gr);
+					return true;
+				}
 			}
+
+			final var userGroup = new UserGroup(this, player.getUniqueId(), group);
+			Aurora.db.userGroups.create(userGroup);
+			Aurora.db.claims.refresh(this);
 		} catch (SQLException e) {
 			Aurora.logger.severe("Failed to set a player group: %s".formatted(e));
 			return false;
@@ -272,15 +272,14 @@ public final class Claim {
 	 */
 	public Group getGroup(final @NotNull OfflinePlayer player) {
 		if (Objects.equals(player.getUniqueId(), this.owner)) return Group.OWNER;
-		if (this.userGroups.size() == 0) return Group.NONE;
 
-		if (this.userGroupById.isEmpty()) {
-			for (final var group : this.userGroups)
-				this.userGroupById.put(group.player, group);
+		for (final var group : this.userGroups) {
+			if (group.player.equals(player.getUniqueId())) {
+				return group.group;
+			}
 		}
 
-		final var group = this.userGroupById.get(player.getUniqueId());
-		return group == null ? Group.NONE : group.group;
+		return Group.NONE;
 	}
 
 	public boolean isAllowed(final @NotNull OfflinePlayer player, final Group group) {
