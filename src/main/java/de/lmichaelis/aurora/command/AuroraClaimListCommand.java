@@ -77,7 +77,8 @@ public class AuroraClaimListCommand extends AuroraBaseCommand {
 		player.sendMessage(plugin.config.messages.claimListFooter.formatted(
 				user.usedClaimBlocks,
 				user.totalClaimBlocks,
-				user.totalClaimBlocks - user.usedClaimBlocks
+				user.totalClaimBlocks - user.usedClaimBlocks,
+				plugin.config.totalClaimsLimit == -1 ? "∞" : plugin.config.totalClaimsLimit - user.totalClaimsUsed
 		));
 
 		return true;

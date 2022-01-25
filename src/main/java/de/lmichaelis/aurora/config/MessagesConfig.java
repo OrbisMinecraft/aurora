@@ -30,7 +30,7 @@ public final class MessagesConfig {
 	public String claimListHeader = "These are your claims:";
 	public String claimListEntry = "§7- %s at (%d, %d); %d blocks";
 	public String claimListEntryAdmin = "§b- %s at (%d, %d); %d blocks (Admin)";
-	public String claimListFooter = "You have used %d of your %d claim blocks. That means you have §a%d claim blocks remaining";
+	public String claimListFooter = "You have used %d of your %d claim blocks. That means you have §a%d claim blocks as well as %d claims remaining.";
 	public String claimListEmpty = "   You haven't created any claims yet.";
 
 	public String leaveAdminMode = "§aYou've left administrative mode.";
