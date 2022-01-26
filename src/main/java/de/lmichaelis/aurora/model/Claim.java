@@ -161,7 +161,9 @@ public final class Claim {
 	}
 
 	public static @Nullable Claim getClaimIfDifferent(final @Nullable Claim other, final @NotNull Location location) {
-		if (other != null && other.contains(location)) return other;
+		// TODO: I have to disable this optimization because it breaks the plugin's behaviour when combined with
+		//  sub-claims. (ie. a block in a sub-claim is always also in the parent claim)
+		// if (other != null && other.contains(location)) return other;
 		return getClaim(location);
 	}
 
