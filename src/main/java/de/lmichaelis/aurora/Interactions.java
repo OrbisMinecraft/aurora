@@ -39,29 +39,32 @@ public final class Interactions {
 			return;
 		}
 
-		if (claim == null || user.newClaimCorner != null) {
-			// The player is creating a new claim
-			if (totalClaimsLimit >= 0 && user.totalClaimsUsed >= totalClaimsLimit && !isAdminClaiming) {
+		if (claim == null || (user.currentResizeClaim != null && claim.owner.equals(user.currentResizeClaim.owner))) {
+			// The player is creating a new claim or setting the second corner for a claim resize
+
+			if (user.currentResizeClaim != null) {
+				// The player is resizing a claim. Try to do that.
+				onClaimResize(player, user, target);
+			} else if (totalClaimsLimit >= 0 && user.totalClaimsUsed >= totalClaimsLimit && !isAdminClaiming) {
 				// The player cannot create any more claims
 				player.sendMessage(Aurora.instance.config.messages.tooManyClaims);
-				return;
-			}
-
-			if (user.newClaimCorner == null) {
+			} else if (user.lastToolLocation == null) {
 				// The user is selecting the first corner of the new claim
-				user.newClaimCorner = target;
+				user.lastToolLocation = target;
 
 				player.sendMessage(Aurora.instance.config.messages.claimCornerSet.formatted(
 						target.getBlockX(), target.getBlockY(), target.getBlockZ()
 				));
 			} else {
 				// The user is setting the second corner of the claim. Try to actually create it.
-				onClaimCreate(player, user, target, user.newClaimCorner, isAdminClaiming);
+				onClaimCreate(player, user, target, user.lastToolLocation, isAdminClaiming);
 			}
-		} else if (claim.isAllowed(player, Group.OWNER) && user.newClaimCorner == null) {
+		} else if (claim.isAllowed(player, Group.OWNER) && user.lastToolLocation == null && user.currentResizeClaim == null) {
 			if (isClaimCorner(claim, target)) {
-				// The player is resizing the claim
-				// TODO
+				// The player is selecting a corner for resizing the claim
+				user.currentResizeClaim = claim;
+				user.lastToolLocation = target;
+				player.sendMessage(Aurora.instance.config.messages.resizingClaim);
 			} else if (user.subdivideMode && claim.parent == null) {
 				// The player is creating a new sub-claim
 				// TODO
@@ -112,7 +115,7 @@ public final class Interactions {
 			cornerB.setY(cornerB.getWorld().getMaxHeight());
 
 			// Reset the selected claim corner
-			user.newClaimCorner = null;
+			user.lastToolLocation = null;
 
 			// Create the new claim and show its boundaries
 			final var claim = new Claim(player.getUniqueId(), "(unnamed)", cornerA, cornerB);
@@ -123,6 +126,104 @@ public final class Interactions {
 		}
 	}
 
+	private static void onClaimResize(final @NotNull Player player, @NotNull User user,
+									  final @NotNull Location newCorner) {
+		final var claim = user.currentResizeClaim;
+		final var oldCorner = user.lastToolLocation;
+
+		if (!claim.owner.equals(user.id)) {
+			// If the user resizing the claim is not actually the owner, we need to make sure
+			// to bill the owner for the resize
+			final var onlineOwner = Bukkit.getPlayer(claim.owner);
+
+			if (onlineOwner != null) {
+				user = Objects.requireNonNull(User.fromMetadata(onlineOwner));
+			} else {
+				user = Objects.requireNonNull(User.get(claim.owner));
+			}
+		}
+
+		if (oldCorner.equals(newCorner)) {
+			// Special case: if the user clicks the same block twice, reset.
+			user.currentResizeClaim = null;
+			user.lastToolLocation = null;
+			return;
+		}
+
+		// Find the new claim extent
+		int newMinX = claim.minX, newMaxX = claim.maxX, newMinY = claim.minY, newMaxY = claim.maxY, newMinZ = claim.minZ, newMaxZ = claim.maxZ;
+		if (oldCorner.getBlockX() == claim.minX) {
+			newMinX = newCorner.getBlockX();
+		} else {
+			newMaxX = newCorner.getBlockX();
+		}
+
+		if (oldCorner.getBlockZ() == claim.minZ) {
+			newMinZ = newCorner.getBlockZ();
+		} else {
+			newMaxZ = newCorner.getBlockZ();
+		}
+
+		// Make sure we're up-to-date on claim block balance
+		user.refresh();
+
+		if (claim.parent != null) {
+			// We're resizing a sub-claim. Respect Y-values as well.
+			if (oldCorner.getBlockY() == claim.minY) {
+				newMinY = newCorner.getBlockY();
+			} else {
+				newMaxY = newCorner.getBlockY();
+			}
+
+			// TODO
+		} else {
+			final var newSizeX = Math.abs(newMaxX - newMinX) + 1;
+			final var newSizeZ = Math.abs(newMaxZ - newMinZ) + 1;
+			final var additionalBlocks = (newSizeX * newSizeZ) - claim.size();
+			final var remainingClaimBlocks = user.totalClaimBlocks - user.usedClaimBlocks;
+
+			final var newLocationMax = new Location(player.getWorld(), newMaxX, newMaxY, newMaxZ);
+			final var newLocationMin = new Location(player.getWorld(), newMinX, newMinY, newMinZ);
+
+			if (additionalBlocks > remainingClaimBlocks && !claim.isAdmin) {
+				// The player does not have enough claim blocks
+				player.sendMessage(Aurora.instance.config.messages.needMoreClaimBlocks.formatted(
+						additionalBlocks - remainingClaimBlocks
+				));
+			} else if (Claim.intersects(newLocationMax, newLocationMin, true, claim)) {
+				// The area selected overlaps another claim
+				player.sendMessage(Aurora.instance.config.messages.wouldOverlapAnotherClaim);
+			} else {
+				// The claim is good to go
+				if (claim.isAdmin) {
+					// We're resizing an admin claim. The user's claim block balance is not touched.
+					player.sendMessage(Aurora.instance.config.messages.claimResized.formatted(newSizeX, newSizeZ));
+				} else {
+					// The user is resizing a non-admin claim
+					player.sendMessage(Aurora.instance.config.messages.claimResized.formatted(newSizeX, newSizeZ));
+
+					user.refresh();
+					user.usedClaimBlocks += additionalBlocks;
+					user.update();
+				}
+
+				// Reset the selected claim corner
+				user.lastToolLocation = null;
+				user.currentResizeClaim = null;
+
+				// Create the new claim and show its boundaries
+				claim.maxX = newMaxX;
+				claim.maxY = newMaxY;
+				claim.maxZ = newMaxZ;
+				claim.minX = newMinX;
+				claim.minY = newMinY;
+				claim.minZ = newMinZ;
+				claim.update();
+
+				showClaimBoundaries(player, claim);
+			}
+		}
+	}
 
 	/**
 	 * Handles player using the configured claim investigation tool (i.e. a stick) to find the owner and

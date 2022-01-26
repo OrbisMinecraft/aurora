@@ -39,7 +39,8 @@ public final class User {
 	public int runningVisualizationTasks = 0;
 	public boolean adminMode = false;
 	public boolean subdivideMode = false;
-	public Location newClaimCorner = null;
+	public Location lastToolLocation = null;
+	public Claim currentResizeClaim = null;
 
 	public User(final UUID id, int totalClaims) {
 		this.id = id;
