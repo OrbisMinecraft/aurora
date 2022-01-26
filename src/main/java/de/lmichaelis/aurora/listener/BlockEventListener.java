@@ -7,10 +7,9 @@ import de.lmichaelis.aurora.AuroraUtil;
 import de.lmichaelis.aurora.model.Claim;
 import de.lmichaelis.aurora.model.Group;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.block.data.type.Chest;
+import org.bukkit.block.data.type.Dispenser;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
@@ -50,7 +49,7 @@ public final class BlockEventListener extends BaseListener {
 				final var relative = block.getRelative(face);
 				if (!(relative.getBlockData() instanceof final Chest relativeBD)) continue;
 
-				final var relativeClaim = Claim.getClaim(relative.getLocation());
+				final var relativeClaim = Claim.getClaimIfDifferent(claim, relative.getLocation());
 				final var relativeOwner = relativeClaim == null ? null : relativeClaim.owner;
 
 				if (Objects.equals(claimOwner, relativeOwner)) continue;
@@ -109,7 +108,7 @@ public final class BlockEventListener extends BaseListener {
 		// Rule: Blocks can always move into unclaimed land
 		if (toClaim == null) return;
 
-		final var fromClaim = Claim.getClaim(from.getLocation());
+		final var fromClaim = Claim.getClaimIfDifferent(toClaim, from.getLocation());
 
 		// Rule: Blocks can move into claims of the same owner
 		if (fromClaim != null && Objects.equals(fromClaim.owner, toClaim.owner)) return;
@@ -158,7 +157,7 @@ public final class BlockEventListener extends BaseListener {
 		// Rule: Pistons cannot push into a claim (even without attached blocks).
 		if (affected.isEmpty()) {
 			final var relativeBlock = piston.getRelative(event.getDirection());
-			final var relativeClaim = Claim.getClaim(relativeBlock.getLocation());
+			final var relativeClaim = Claim.getClaimIfDifferent(claim, relativeBlock.getLocation());
 
 			if ((claim == null && relativeClaim != null) ||
 					(relativeClaim != null && !Objects.equals(claim.owner, relativeClaim.owner)))
@@ -168,7 +167,8 @@ public final class BlockEventListener extends BaseListener {
 
 		// Rule: If all blocks are in the same claim as the piston it is allowed to extend
 		if (claim != null) {
-			if (affected.stream().allMatch(b -> claim.contains(b.getRelative(event.getDirection()).getLocation()))) return;
+			if (affected.stream().allMatch(b -> claim.contains(b.getRelative(event.getDirection()).getLocation())))
+				return;
 		}
 
 		// Rule: Pistons can move any block within claims of the same owner, and they can
@@ -197,10 +197,7 @@ public final class BlockEventListener extends BaseListener {
 		// Rule: Fire can always spread outside of claims
 		if (targetClaim == null) return;
 
-		// Rule: Fire can only spread within the same claim
-		if (targetClaim.contains(source.getLocation())) return;
-
-		final var sourceClaim = Claim.getClaim(source.getLocation());
+		final var sourceClaim = Claim.getClaimIfDifferent(targetClaim, source.getLocation());
 		if (sourceClaim != null && Objects.equals(sourceClaim.owner, targetClaim.owner)) return;
 
 		// Extinguish fire that is not placed on netherrack. This behaviour is copied from GriefPrevention
@@ -244,10 +241,7 @@ public final class BlockEventListener extends BaseListener {
 		// Rule: Dispensing into the wild is always allowed
 		if (targetClaim == null) return;
 
-		// Rule: Dispensing into the same claim is allowed
-		if (targetClaim.contains(source.getLocation())) return;
-
-		final var sourceClaim = Claim.getClaim(source.getLocation());
+		final var sourceClaim = Claim.getClaimIfDifferent(targetClaim, source.getLocation());
 		if (sourceClaim != null && Objects.equals(sourceClaim.owner, targetClaim.owner)) return;
 
 		event.setCancelled(true);
@@ -283,7 +277,7 @@ public final class BlockEventListener extends BaseListener {
 			final var igniter = event.getIgnitingBlock();
 			if (claim.contains(igniter.getLocation())) return;
 
-			final var igniterClaim = Claim.getClaim(igniter.getLocation());
+			final var igniterClaim = Claim.getClaimIfDifferent(claim, igniter.getLocation());
 			if (igniterClaim != null && Objects.equals(igniterClaim.owner, claim.owner)) return;
 		} else if (event.getIgnitingEntity() instanceof final Fireball fireball) {
 			// Rule: Allow dispensers to use a fireball in the same claim or a claim with the same owner
@@ -292,7 +286,7 @@ public final class BlockEventListener extends BaseListener {
 			if (igniter instanceof final BlockProjectileSource source) {
 				if (claim.contains(source.getBlock().getLocation())) return;
 
-				final var igniterClaim = Claim.getClaim(source.getBlock().getLocation());
+				final var igniterClaim = Claim.getClaimIfDifferent(claim, source.getBlock().getLocation());
 				if (igniterClaim != null && Objects.equals(igniterClaim.owner, claim.owner)) return;
 			}
 		} else if (event.getIgnitingEntity() instanceof final Player player) {

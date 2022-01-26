@@ -145,6 +145,11 @@ public final class Claim {
 		}
 	}
 
+	public static @Nullable Claim getClaimIfDifferent(final @Nullable Claim other, final @NotNull Location location) {
+		if (other != null && other.contains(location)) return other;
+		return getClaim(location);
+	}
+
 	public static boolean intersects(final @NotNull Location areaCornerA, final @NotNull Location areaCornerB, boolean ignoreY) {
 		return intersects(areaCornerA, areaCornerB, ignoreY, null);
 	}

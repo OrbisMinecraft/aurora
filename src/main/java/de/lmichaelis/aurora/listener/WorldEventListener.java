@@ -25,7 +25,7 @@ public final class WorldEventListener extends BaseListener {
 		final var iter = event.getBlocks().iterator();
 		while (iter.hasNext()) {
 			final var block = iter.next();
-			final var blockClaim = Claim.getClaim(block.getLocation());
+			final var blockClaim = Claim.getClaimIfDifferent(rootClaim, block.getLocation());
 
 			if (blockClaim != null && (rootClaim == null || rootClaim.owner != blockClaim.owner)) {
 				iter.remove();

@@ -85,7 +85,7 @@ public final class EntityEventListener extends BaseListener {
 
 			// Rule: Allow all damage from non-player projectiles originating from a dispenser inside the claim
 			if (projectile.getShooter() instanceof final BlockProjectileSource source) {
-				final var sourceClaim = Claim.getClaim(source.getBlock().getLocation());
+				final var sourceClaim = Claim.getClaimIfDifferent(claim, source.getBlock().getLocation());
 				if (sourceClaim != null && Objects.equals(sourceClaim.owner, claim.owner)) return;
 			}
 		}
@@ -183,7 +183,7 @@ public final class EntityEventListener extends BaseListener {
 			} else if (projectile.getShooter() instanceof final BlockProjectileSource source) {
 				// Rule: Dispensers shooting arrows from within a claim with the same
 				//       owner can also change blocks
-				final var sourceClaim = Claim.getClaim(source.getBlock().getLocation());
+				final var sourceClaim = Claim.getClaimIfDifferent(claim, source.getBlock().getLocation());
 				if (sourceClaim != null && Objects.equals(sourceClaim.owner, claim.owner)) return;
 			}
 		} else if (entity instanceof Vehicle && !entity.getPassengers().isEmpty()) {
@@ -285,7 +285,7 @@ public final class EntityEventListener extends BaseListener {
 				} else if (thrower instanceof final BlockProjectileSource source) {
 					// Rule: Dispensers in a claim owned by the same player can apply negative
 					//       effects to entities inside it.
-					final var sourceClaim = Claim.getClaim(source.getBlock().getLocation());
+					final var sourceClaim = Claim.getClaimIfDifferent(claim, source.getBlock().getLocation());
 					if (sourceClaim == null || sourceClaim.owner != claim.owner) event.setIntensity(affected, 0);
 				}
 			}
