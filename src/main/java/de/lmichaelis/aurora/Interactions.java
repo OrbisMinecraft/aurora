@@ -39,12 +39,22 @@ public final class Interactions {
 			return;
 		}
 
-		if (claim == null || (user.currentResizeClaim != null && claim.owner.equals(user.currentResizeClaim.owner))) {
+		if (claim == null || (user.lastSelectedClaim != null && claim.id == user.lastSelectedClaim.id)) {
 			// The player is creating a new claim or setting the second corner for a claim resize
+			if (user.lastSelectedClaim != null) {
+				if (user.subdivideMode) {
+					if (claim == null) {
+						// The other corner of a subdivision claim is outside the main claim!
+						player.sendMessage(Aurora.instance.config.messages.invalidSubclaimLocation);
+						return;
+					}
 
-			if (user.currentResizeClaim != null) {
-				// The player is resizing a claim. Try to do that.
-				onClaimResize(player, user, target);
+					// The player is creating a new sub-claim
+					onClaimCreate(player, user, target, user.lastToolLocation, isAdminClaiming, user.lastSelectedClaim);
+				} else {
+					// The player is resizing a claim. Try to do that.
+					onClaimResize(player, user, target);
+				}
 			} else if (totalClaimsLimit >= 0 && user.totalClaimsUsed >= totalClaimsLimit && !isAdminClaiming) {
 				// The player cannot create any more claims
 				player.sendMessage(Aurora.instance.config.messages.tooManyClaims);
@@ -57,17 +67,28 @@ public final class Interactions {
 				));
 			} else {
 				// The user is setting the second corner of the claim. Try to actually create it.
-				onClaimCreate(player, user, target, user.lastToolLocation, isAdminClaiming);
+				onClaimCreate(player, user, target, user.lastToolLocation, isAdminClaiming, null);
 			}
-		} else if (claim.isAllowed(player, Group.OWNER) && user.lastToolLocation == null && user.currentResizeClaim == null) {
+		} else if (claim.isAllowed(player, Group.OWNER) && user.lastToolLocation == null && user.lastSelectedClaim == null) {
 			if (isClaimCorner(claim, target)) {
 				// The player is selecting a corner for resizing the claim
-				user.currentResizeClaim = claim;
+
+				if (claim.parent != null) {
+					// We currently do not support sub-claim resizing
+					player.sendMessage("§cResizing subdivisions is currently not supported");
+					return;
+				}
+
+				user.lastSelectedClaim = claim;
 				user.lastToolLocation = target;
 				player.sendMessage(Aurora.instance.config.messages.resizingClaim);
 			} else if (user.subdivideMode && claim.parent == null) {
 				// The player is creating a new sub-claim
-				// TODO
+				user.lastToolLocation = target;
+				user.lastSelectedClaim = claim;
+				player.sendMessage(Aurora.instance.config.messages.claimCornerSet.formatted(
+						target.getBlockX(), target.getBlockY(), target.getBlockZ()
+				));
 			} else {
 				// The player is not in subdivision mode, or they tried to create a nested sub-claim
 				player.sendMessage(user.subdivideMode ? Aurora.instance.config.messages.noNestedSubclaims
@@ -80,22 +101,26 @@ public final class Interactions {
 	}
 
 	private static void onClaimCreate(final @NotNull Player player, final @NotNull User user,
-									  final @NotNull Location cornerA, final @NotNull Location cornerB, boolean admin) {
+									  final @NotNull Location cornerA, final @NotNull Location cornerB, boolean admin,
+									  final Claim parent) {
 		final var remainingClaimBlocks = user.totalClaimBlocks - user.usedClaimBlocks;
 		final var sizeX = Math.abs(cornerA.getBlockX() - cornerB.getBlockX()) + 1;
 		final var sizeZ = Math.abs(cornerA.getBlockZ() - cornerB.getBlockZ()) + 1;
 
-		if (sizeX * sizeZ > remainingClaimBlocks && !admin) {
+		if (sizeX * sizeZ > remainingClaimBlocks && !admin && parent == null) {
 			// The player does not have enough claim blocks to claim the area they selected
 			player.sendMessage(Aurora.instance.config.messages.needMoreClaimBlocks.formatted(
 					sizeX * sizeZ - remainingClaimBlocks
 			));
-		} else if (Claim.intersects(cornerA, cornerB, true)) {
+		} else if (parent == null && Claim.intersects(cornerA, cornerB, true)) {
 			// The area selected overlaps another claim
+			player.sendMessage(Aurora.instance.config.messages.wouldOverlapAnotherClaim);
+		} else if (parent != null && Claim.intersects(cornerA, cornerB, false, user.lastSelectedClaim)) {
+			// The area selected overlaps another sub-claim
 			player.sendMessage(Aurora.instance.config.messages.wouldOverlapAnotherClaim);
 		} else {
 			// The claim is good to go
-			if (admin) {
+			if (admin || parent != null) {
 				// We're creating an admin claim. The user's claim block balance is not touched.
 				player.sendMessage(Aurora.instance.config.messages.claimCreated.formatted(sizeX, sizeZ, 0));
 			} else {
@@ -111,15 +136,19 @@ public final class Interactions {
 			}
 
 			// Top level claims always range from the top of the world to the very bottom
-			cornerA.setY(cornerA.getWorld().getMinHeight());
-			cornerB.setY(cornerB.getWorld().getMaxHeight());
+			if (parent == null) {
+				cornerA.setY(cornerA.getWorld().getMinHeight());
+				cornerB.setY(cornerB.getWorld().getMaxHeight());
+			}
 
 			// Reset the selected claim corner
 			user.lastToolLocation = null;
+			user.lastSelectedClaim = null;
 
 			// Create the new claim and show its boundaries
-			final var claim = new Claim(player.getUniqueId(), "(unnamed)", cornerA, cornerB);
+			final var claim = new Claim(parent == null ? player.getUniqueId() : parent.owner, "(unnamed)", cornerA, cornerB);
 			claim.isAdmin = admin;
+			claim.parent = parent;
 			claim.save();
 
 			showClaimBoundaries(player, claim);
@@ -128,7 +157,7 @@ public final class Interactions {
 
 	private static void onClaimResize(final @NotNull Player player, @NotNull User user,
 									  final @NotNull Location newCorner) {
-		final var claim = user.currentResizeClaim;
+		final var claim = user.lastSelectedClaim;
 		final var oldCorner = user.lastToolLocation;
 
 		if (!claim.owner.equals(user.id)) {
@@ -145,7 +174,7 @@ public final class Interactions {
 
 		if (oldCorner.equals(newCorner)) {
 			// Special case: if the user clicks the same block twice, reset.
-			user.currentResizeClaim = null;
+			user.lastSelectedClaim = null;
 			user.lastToolLocation = null;
 			return;
 		}
@@ -167,62 +196,74 @@ public final class Interactions {
 		// Make sure we're up-to-date on claim block balance
 		user.refresh();
 
-		if (claim.parent != null) {
-			// We're resizing a sub-claim. Respect Y-values as well.
-			if (oldCorner.getBlockY() == claim.minY) {
-				newMinY = newCorner.getBlockY();
-			} else {
-				newMaxY = newCorner.getBlockY();
-			}
+		final var newSizeX = Math.abs(newMaxX - newMinX) + 1;
+		final var newSizeZ = Math.abs(newMaxZ - newMinZ) + 1;
+		final var additionalBlocks = (newSizeX * newSizeZ) - claim.size();
+		final var remainingClaimBlocks = user.totalClaimBlocks - user.usedClaimBlocks;
 
-			// TODO
+		final var newLocationMax = new Location(player.getWorld(), newMaxX, newMaxY, newMaxZ);
+		final var newLocationMin = new Location(player.getWorld(), newMinX, newMinY, newMinZ);
+
+		if (additionalBlocks > remainingClaimBlocks && !claim.isAdmin && claim.parent == null) {
+			// The player does not have enough claim blocks
+			player.sendMessage(Aurora.instance.config.messages.needMoreClaimBlocks.formatted(
+					additionalBlocks - remainingClaimBlocks
+			));
+		} else if (Claim.intersects(newLocationMax, newLocationMin, claim.parent == null, claim,
+				claim.parent == null)) {
+			// The area selected overlaps another claim
+			player.sendMessage(Aurora.instance.config.messages.wouldOverlapAnotherClaim);
+		} else if (!checkSubdivisionsStillInside(claim, newLocationMin, newLocationMax)) {
+			// The resized area would not include some sub-claims
+			player.sendMessage("§cCannot resize because some of your subclaims would not be contained within the claim.");
 		} else {
-			final var newSizeX = Math.abs(newMaxX - newMinX) + 1;
-			final var newSizeZ = Math.abs(newMaxZ - newMinZ) + 1;
-			final var additionalBlocks = (newSizeX * newSizeZ) - claim.size();
-			final var remainingClaimBlocks = user.totalClaimBlocks - user.usedClaimBlocks;
-
-			final var newLocationMax = new Location(player.getWorld(), newMaxX, newMaxY, newMaxZ);
-			final var newLocationMin = new Location(player.getWorld(), newMinX, newMinY, newMinZ);
-
-			if (additionalBlocks > remainingClaimBlocks && !claim.isAdmin) {
-				// The player does not have enough claim blocks
-				player.sendMessage(Aurora.instance.config.messages.needMoreClaimBlocks.formatted(
-						additionalBlocks - remainingClaimBlocks
-				));
-			} else if (Claim.intersects(newLocationMax, newLocationMin, true, claim)) {
-				// The area selected overlaps another claim
-				player.sendMessage(Aurora.instance.config.messages.wouldOverlapAnotherClaim);
+			// The claim is good to go
+			if (claim.isAdmin || claim.parent != null) {
+				// We're resizing an admin claim. The user's claim block balance is not touched.
+				player.sendMessage(Aurora.instance.config.messages.claimResized.formatted(newSizeX, newSizeZ));
 			} else {
-				// The claim is good to go
-				if (claim.isAdmin) {
-					// We're resizing an admin claim. The user's claim block balance is not touched.
-					player.sendMessage(Aurora.instance.config.messages.claimResized.formatted(newSizeX, newSizeZ));
-				} else {
-					// The user is resizing a non-admin claim
-					player.sendMessage(Aurora.instance.config.messages.claimResized.formatted(newSizeX, newSizeZ));
+				// The user is resizing a non-admin claim
+				player.sendMessage(Aurora.instance.config.messages.claimResized.formatted(newSizeX, newSizeZ));
 
-					user.refresh();
-					user.usedClaimBlocks += additionalBlocks;
-					user.update();
-				}
-
-				// Reset the selected claim corner
-				user.lastToolLocation = null;
-				user.currentResizeClaim = null;
-
-				// Create the new claim and show its boundaries
-				claim.maxX = newMaxX;
-				claim.maxY = newMaxY;
-				claim.maxZ = newMaxZ;
-				claim.minX = newMinX;
-				claim.minY = newMinY;
-				claim.minZ = newMinZ;
-				claim.update();
-
-				showClaimBoundaries(player, claim);
+				user.refresh();
+				user.usedClaimBlocks += additionalBlocks;
+				user.update();
 			}
+
+			// Reset the selected claim corner
+			user.lastToolLocation = null;
+			user.lastSelectedClaim = null;
+
+			// Create the new claim and show its boundaries
+			claim.maxX = newMaxX;
+			claim.maxY = newMaxY;
+			claim.maxZ = newMaxZ;
+			claim.minX = newMinX;
+			claim.minY = newMinY;
+			claim.minZ = newMinZ;
+			claim.update();
+
+			showClaimBoundaries(player, claim);
 		}
+	}
+
+	private static boolean containsSubdivision(Location newLocationMin, Location newLocationMax, Claim sub) {
+		return sub.minX >= newLocationMin.getBlockX() &&
+				sub.maxX <= newLocationMax.getBlockX() &&
+				sub.minY >= newLocationMin.getBlockY() &&
+				sub.maxY <= newLocationMax.getBlockY() &&
+				sub.minZ >= newLocationMin.getBlockZ() &&
+				sub.maxZ <= newLocationMax.getBlockZ() &&
+				Objects.equals(sub.world, newLocationMin.getWorld().getName());
+	}
+
+	private static boolean checkSubdivisionsStillInside(Claim claim, Location newLocationMin, Location newLocationMax) {
+		for (final var subclaim : claim.getSubClaims()) {
+			if (!containsSubdivision(newLocationMin, newLocationMax, subclaim))
+				return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -261,7 +302,7 @@ public final class Interactions {
 
 		final var visTask = Bukkit.getScheduler().runTaskTimer(
 				Aurora.instance,
-				new ClaimVisualizationTask(claim, player, Color.RED),
+				new ClaimVisualizationTask(claim, player, claim.isAdmin ? Color.RED : (claim.parent == null ? Color.BLUE : Color.GREEN)),
 				0, 5
 		);
 

@@ -38,4 +38,8 @@ public final class MessagesConfig {
 	public String leaveAdminMode = "§aYou've left administrative mode.";
 	public String enterAdminMode = "§aYou've entered administrative mode.";
 	public String creatingAdminClaim = "§aYou'll be creating an admin claim.";
+
+	public String enterSubdivideMode = "§bYou've entered claim subdivision mode.";
+	public String leaveSubdivideMode = "§bYou've left claim subdivision mode.";
+	public String invalidSubclaimLocation = "§cYou cannot create a subclaim here since it is outside of the main claim.";
 }

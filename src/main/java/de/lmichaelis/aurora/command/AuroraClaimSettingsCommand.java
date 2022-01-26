@@ -20,6 +20,8 @@ public class AuroraClaimSettingsCommand extends AuroraBaseCommand {
 			"pvp",
 			"mobGriefing",
 			"explosions",
+			"restricted",
+			"show",
 			"name"
 	);
 
@@ -35,7 +37,7 @@ public class AuroraClaimSettingsCommand extends AuroraBaseCommand {
 	@Override
 	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 		if (!(sender instanceof final Player player)) return false;
-		if (args.length < 3) return false;
+		if (args.length < 2 || (!args[1].equals("show") && args.length < 3)) return false;
 		final var claim = Claim.getClaim(player.getLocation());
 
 		if (claim == null) {
@@ -43,7 +45,7 @@ public class AuroraClaimSettingsCommand extends AuroraBaseCommand {
 		} else if (!claim.isAllowed(player, Group.MANAGE)) {
 			player.sendMessage(plugin.config.messages.notClaimOwner);
 		} else {
-			final var enabled = args[2].equals("on");
+			final var enabled = args.length == 3 && args[2].equals("on");
 
 			switch (args[1]) {
 				case "pvp" -> {
@@ -62,6 +64,21 @@ public class AuroraClaimSettingsCommand extends AuroraBaseCommand {
 					claim.name = Arrays.stream(args).skip(2).collect(Collectors.joining(" "));
 					player.sendMessage("Set this claim's name to '" + claim.name + "'");
 				}
+				case "restricted" -> {
+					if (claim.parent == null) {
+						player.sendMessage("§cRestricted mode can only be enabled for subclaims.");
+						return true;
+					}
+
+					claim.restricted = enabled;
+					player.sendMessage((enabled ? "Enabled" : "Disabled") + " restriced mode for this claim.");
+				}
+				case "show" -> {
+					player.sendMessage("PvP: " + (claim.pvpEnabled ? "Enabled" : "Disabled"));
+					player.sendMessage("Mob griefing: " + (claim.mobGriefing ? "Enabled" : "Disabled"));
+					player.sendMessage("Explosions: " + (claim.allowsExplosions ? "Enabled" : "Disabled"));
+					player.sendMessage("Restricted: " + (claim.restricted ? "Enabled" : "Disabled"));
+				}
 				default -> {
 					return false;
 				}
@@ -75,6 +92,6 @@ public class AuroraClaimSettingsCommand extends AuroraBaseCommand {
 
 	@Override
 	public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-		return args.length < 3 ? VARIABLES : (args[1].equals("name") ? List.of() : List.of("on", "off"));
+		return args.length < 3 ? VARIABLES : ((args[1].equals("name") || args[1].equals("show")) ? List.of() : List.of("on", "off"));
 	}
 }

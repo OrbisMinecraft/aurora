@@ -40,7 +40,7 @@ public final class User {
 	public boolean adminMode = false;
 	public boolean subdivideMode = false;
 	public Location lastToolLocation = null;
-	public Claim currentResizeClaim = null;
+	public Claim lastSelectedClaim = null;
 
 	public User(final UUID id, int totalClaims) {
 		this.id = id;

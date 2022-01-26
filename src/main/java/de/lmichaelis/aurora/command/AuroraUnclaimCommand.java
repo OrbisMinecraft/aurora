@@ -36,6 +36,10 @@ public class AuroraUnclaimCommand extends AuroraBaseCommand {
 		} else if (!claim.isAllowed(player, Group.OWNER)) {
 			player.sendMessage(plugin.config.messages.notClaimOwner);
 		} else {
+			for (final var subclaim : claim.getSubClaims()) {
+				subclaim.delete();
+			}
+
 			claim.delete();
 
 			final var ownerPlayer = plugin.getServer().getPlayer(claim.owner);

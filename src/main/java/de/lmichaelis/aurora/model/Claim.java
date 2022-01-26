@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -73,6 +74,9 @@ public final class Claim {
 	@DatabaseField(canBeNull = false, columnName = "is_admin", defaultValue = "false")
 	public boolean isAdmin;
 
+	@DatabaseField(canBeNull = false, columnName = "is_restricted", defaultValue = "false")
+	public boolean restricted;
+
 	@ForeignCollectionField(foreignFieldName = "claim", eager = true)
 	private ForeignCollection<UserGroup> userGroups;
 
@@ -86,6 +90,7 @@ public final class Claim {
 		this.pvpEnabled = false;
 		this.allowsExplosions = false;
 		this.isAdmin = false;
+		this.restricted = false;
 
 		this.minX = Math.min(cornerA.getBlockX(), cornerB.getBlockX());
 		this.minY = Math.min(cornerA.getBlockY(), cornerB.getBlockY());
@@ -104,6 +109,7 @@ public final class Claim {
 		this.pvpEnabled = false;
 		this.allowsExplosions = false;
 		this.isAdmin = false;
+		this.restricted = false;
 
 		this.minX = Math.min(cornerA.getBlockX(), cornerB.getBlockX());
 		this.minY = Math.min(cornerA.getBlockY(), cornerB.getBlockY());
@@ -115,6 +121,15 @@ public final class Claim {
 
 	@SuppressWarnings("ProtectedMemberInFinalClass")
 	protected Claim() {
+	}
+
+	public List<Claim> getSubClaims() {
+		try {
+			return Aurora.db.claims.queryBuilder().where().eq("parent_id", this.id).query();
+		} catch (SQLException e) {
+			Aurora.logger.severe("Failed to get subclaims of claim %d: %s".formatted(id, e));
+			return List.of();
+		}
 	}
 
 	/**
@@ -155,35 +170,36 @@ public final class Claim {
 	}
 
 	public static boolean intersects(final @NotNull Location areaCornerA, final @NotNull Location areaCornerB, boolean ignoreY, Claim ignoredClaim) {
-		assert ignoreY;  // TODO: not implemented
+		return intersects(areaCornerA, areaCornerB, ignoreY, ignoredClaim, false);
+	}
 
+	public static boolean intersects(final @NotNull Location areaCornerA, final @NotNull Location areaCornerB, boolean ignoreY, Claim ignoredClaim, boolean ignoreSubclaims) {
 		final var minX = Math.min(areaCornerA.getBlockX(), areaCornerB.getBlockX());
-		// final var minY = Math.min(areaCornerA.getBlockY(), areaCornerB.getBlockY());
 		final var minZ = Math.min(areaCornerA.getBlockZ(), areaCornerB.getBlockZ());
 		final var maxX = Math.max(areaCornerA.getBlockX(), areaCornerB.getBlockX());
-		// final var maxY = Math.max(areaCornerA.getBlockY(), areaCornerB.getBlockY());
 		final var maxZ = Math.max(areaCornerA.getBlockZ(), areaCornerB.getBlockZ());
 
-		try {
-			if (ignoredClaim != null) {
-				return Aurora.db.claims.queryBuilder().where()
-						.eq("world", areaCornerA.getWorld().getName()).and()
-						.le("min_x", maxX).and()
-						.ge("max_x", minX).and()
-						.le("min_z", maxZ).and()
-						.ge("max_z", minZ).and()
-						.ne("id", ignoredClaim.id)
-						.countOf() > 0;
+		final var minY = Math.min(areaCornerA.getBlockY(), areaCornerB.getBlockY());
+		final var maxY = Math.max(areaCornerA.getBlockY(), areaCornerB.getBlockY());
 
-			} else {
-				return Aurora.db.claims.queryBuilder().where()
-						.eq("world", areaCornerA.getWorld().getName()).and()
-						.le("min_x", maxX).and()
-						.ge("max_x", minX).and()
-						.le("min_z", maxZ).and()
-						.ge("max_z", minZ)
-						.countOf() > 0;
+		try {
+			final var query = Aurora.db.claims.queryBuilder().where()
+					.eq("world", areaCornerA.getWorld().getName()).and()
+					.le("min_x", maxX).and()
+					.ge("max_x", minX).and()
+					.le("min_z", maxZ).and()
+					.ge("max_z", minZ);
+
+			if (ignoredClaim != null) query.and().ne("id", ignoredClaim.id);
+			if (ignoreSubclaims) query.and().isNull("parent_id");
+
+			if (!ignoreY) {
+				query.and()
+						.le("min_y", maxY).and()
+						.ge("max_y", minY);
 			}
+
+			return query.countOf() > 0;
 		} catch (SQLException e) {
 			Aurora.logger.severe("Failed to get claim: %s".formatted(e));
 			return true;
@@ -263,6 +279,10 @@ public final class Claim {
 			if (group.player.equals(player.getUniqueId())) {
 				return group.group;
 			}
+		}
+
+		if (!restricted && parent != null) {
+			return this.parent.getGroup(player);
 		}
 
 		return Group.NONE;

@@ -29,16 +29,20 @@ public class ClaimVisualizationTask implements Runnable {
 	}
 
 	private void drawLineX(int x, int y, int z) {
-		player.spawnParticle(PARTICLE, x, y, z, particleDensityX / 2, particleDensityX / 2., 0, 0, options);
+		player.spawnParticle(PARTICLE, x, y, z, Math.max(particleDensityX / 2, 5), particleDensityX / 2., 0, 0, options);
 	}
 
 	private void drawLineY(int x, int y, int z) {
-		player.spawnParticle(PARTICLE, x, y, z, particleDensityY / 3, 0, particleDensityY / 3.f, 0, options);
-		player.spawnParticle(PARTICLE, x, this.player.getLocation().getY(), z, 20, 0, 10, 0, options);
+		player.spawnParticle(PARTICLE, x, y, z, Math.max(particleDensityY / 3, 5), 0, Math.max(particleDensityY / 3.f, 1), 0, options);
+
+		// Don't show highlights for sub-claims.
+		if (claim.parent == null)  {
+			player.spawnParticle(PARTICLE, x, this.player.getLocation().getY(), z, 20, 0, 10, 0, options);
+		}
 	}
 
 	private void drawLineZ(int x, int y, int z) {
-		player.spawnParticle(PARTICLE, x, y, z, particleDensityZ, 0, 0, particleDensityZ / 3.f, options);
+		player.spawnParticle(PARTICLE, x, y, z, Math.max(particleDensityZ / 2, 5), 0, 0, particleDensityZ / 3.f, options);
 	}
 
 	@Override
@@ -61,11 +65,13 @@ public class ClaimVisualizationTask implements Runnable {
 		drawLineZ(claim.minX, claim.maxY, claim.minZ + particleDensityZ);
 		drawLineZ(claim.maxX + 1, claim.maxY, claim.minZ + particleDensityZ);
 
-		// Draw a line at the player's head position
-		final var playerY = (int) player.getLocation().getY() + 1;
-		drawLineX(claim.minX + particleDensityX, playerY, claim.minZ);
-		drawLineX(claim.minX + particleDensityX, playerY, claim.maxZ + 1);
-		drawLineZ(claim.minX, playerY, claim.minZ + particleDensityZ);
-		drawLineZ(claim.maxX + 1, playerY, claim.minZ + particleDensityZ);
+		// Draw a line at the player's head position only if we're not inspecting a subclaim
+		if (claim.parent == null) {
+			final var playerY = (int) player.getLocation().getY() + 1;
+			drawLineX(claim.minX + particleDensityX, playerY, claim.minZ);
+			drawLineX(claim.minX + particleDensityX, playerY, claim.maxZ + 1);
+			drawLineZ(claim.minX, playerY, claim.minZ + particleDensityZ);
+			drawLineZ(claim.maxX + 1, playerY, claim.minZ + particleDensityZ);
+		}
 	}
 }

@@ -39,3 +39,7 @@ messages:
   leaveAdminMode: "§aYou've left administrative mode."
   enterAdminMode: "§aYou've entered administrative mode."
   creatingAdminClaim: "§aYou'll be creating an admin claim."
+
+  enterSubdivideMode: "§bYou've entered claim subdivision mode."
+  leaveSubdivideMode: "§bYou've left claim subdivision mode."
+  invalidSubclaimLocation: "§cYou cannot create a subclaim here since it is outside of the main claim."
