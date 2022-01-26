@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
 import org.bukkit.projectiles.BlockProjectileSource;
 import org.jetbrains.annotations.NotNull;
 
@@ -194,6 +195,25 @@ public final class EntityEventListener extends BaseListener {
 
 		// FIXME: Prevent sand cannons from working. This requires checking for a falling
 		//        gravity block and setting some metadata on it.
+
+		event.setCancelled(true);
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onVehicleCollision(final @NotNull VehicleEntityCollisionEvent event) {
+		final var vehicle = event.getVehicle();
+		final var entity = event.getEntity();
+
+		// We only care about players here
+		if (!(entity instanceof final Player player)) return;
+
+		final var claim = Claim.getClaim(vehicle.getLocation());
+
+		// Rule: Allow pushing all vehicles outside of claim
+		if (claim == null) return;
+
+		// Rule: Inside claims, only players with the STEAL group may push vehicles
+		if (claim.isAllowed(player, Group.STEAL)) return;
 
 		event.setCancelled(true);
 	}
