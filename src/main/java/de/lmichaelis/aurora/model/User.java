@@ -73,33 +73,27 @@ public final class User {
 		}
 	}
 
-	public boolean update() {
+	public void update() {
 		try {
 			Aurora.db.users.update(this);
-			return true;
 		} catch (SQLException e) {
 			Aurora.logger.severe("Failed to update user (%s): %s".formatted(id, e));
-			return false;
 		}
 	}
 
-	public boolean save() {
+	public void save() {
 		try {
 			Aurora.db.users.create(this);
-			return true;
 		} catch (SQLException e) {
 			Aurora.logger.severe("Failed to create user (%s): %s".formatted(id, e));
-			return false;
 		}
 	}
 
-	public boolean refresh() {
+	public void refresh() {
 		try {
 			Aurora.db.users.refresh(this);
-			return true;
 		} catch (SQLException e) {
 			Aurora.logger.severe("Failed to refresh user (%s): %s".formatted(id, e));
-			return false;
 		}
 	}
 }

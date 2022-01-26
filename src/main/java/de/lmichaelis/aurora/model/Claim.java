@@ -16,7 +16,6 @@ import org.jetbrains.annotations.Nullable;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -26,8 +25,6 @@ import java.util.UUID;
  */
 @DatabaseTable(tableName = "claims")
 public final class Claim {
-	private final HashMap<UUID, UserGroup> userGroupById = new HashMap<>();
-
 	@DatabaseField(generatedId = true)
 	public int id;
 
@@ -194,46 +191,34 @@ public final class Claim {
 
 	/**
 	 * Saves the claim into the database.
-	 *
-	 * @return <tt>true</tt> if saving the claim was successful, <tt>false</tt> if not.
 	 */
-	public boolean save() {
+	public void save() {
 		try {
 			Aurora.db.claims.create(this);
-			return true;
 		} catch (SQLException e) {
 			Aurora.logger.severe("Failed to create a claim: %s".formatted(e));
-			return false;
 		}
 	}
 
 	/**
 	 * Updates the claim in the database.
-	 *
-	 * @return <tt>true</tt> if updating the claim was successful, <tt>false</tt> if not.
 	 */
-	public boolean update() {
+	public void update() {
 		try {
 			Aurora.db.claims.update(this);
-			return true;
 		} catch (SQLException e) {
 			Aurora.logger.severe("Failed to update a claim: %s".formatted(e));
-			return false;
 		}
 	}
 
 	/**
 	 * Deletes the claim from the database.
-	 *
-	 * @return <tt>true</tt> if deleting the claim was successful, <tt>false</tt> if not.
 	 */
-	public boolean delete() {
+	public void delete() {
 		try {
 			Aurora.db.claims.delete(this);
-			return true;
 		} catch (SQLException e) {
 			Aurora.logger.severe("Failed to delete a claim: %s".formatted(e));
-			return false;
 		}
 	}
 
@@ -243,13 +228,12 @@ public final class Claim {
 	 * @param player The player to set the group for.
 	 * @param group  The group to set.
 	 */
-	public boolean setGroup(final @NotNull OfflinePlayer player, final Group group) {
+	public void setGroup(final @NotNull OfflinePlayer player, final Group group) {
 		try {
 			for (final var gr : this.userGroups) {
 				if (gr.player.equals(player.getUniqueId())) {
 					gr.group = group;
 					Aurora.db.userGroups.update(gr);
-					return true;
 				}
 			}
 
@@ -258,10 +242,7 @@ public final class Claim {
 			Aurora.db.claims.refresh(this);
 		} catch (SQLException e) {
 			Aurora.logger.severe("Failed to set a player group: %s".formatted(e));
-			return false;
 		}
-
-		return true;
 	}
 
 	/**
