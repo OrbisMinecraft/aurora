@@ -78,7 +78,7 @@ public final class Claim {
 	public boolean restricted;
 
 	@ForeignCollectionField(foreignFieldName = "claim", eager = true)
-	private ForeignCollection<UserGroup> userGroups;
+	public ForeignCollection<UserGroup> userGroups;
 
 	public Claim(final @NotNull UUID owner, final @NotNull String name,
 				 final @NotNull Location cornerA, final @NotNull Location cornerB) {
