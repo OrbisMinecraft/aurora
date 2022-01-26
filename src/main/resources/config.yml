@@ -27,6 +27,8 @@ messages:
   unknownPlayer: "§cI've never seen a player by that name."
   cannotSetOwnGroup: "§cYou can't change your own group."
   tooManyClaims: "§cYou can't create any more claims."
+  noNestedSubclaims: "§cYou can't create nested subclaims."
+  sublaimsRequireMode: "§cTo create subclaims, switch to subdivision mode."
 
   claimListHeader: "These are your claims:"
   claimListEntry: "§3- %s at (%d, %d); %d blocks"

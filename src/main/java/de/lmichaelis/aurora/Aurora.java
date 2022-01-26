@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 public final class Aurora extends JavaPlugin {
 	public static Logger logger;
 	public static Database db;
+	public static Aurora instance;
 	public AuroraConfig config;
 
 	private BaseListener[] listeners;
@@ -43,6 +44,8 @@ public final class Aurora extends JavaPlugin {
 	 */
 	@Override
 	public void onEnable() {
+		Aurora.instance = this;
+
 		// Register the base command
 		this.command = new AuroraRootCommand(this);
 		this.command.addSubCommand("reload", new AuroraReloadCommand(this));
