@@ -300,21 +300,17 @@ public final class Interactions {
 										   final @NotNull Claim claim) {
 		final var user = Objects.requireNonNull(User.fromMetadata(player));
 
-		// Only run at most three visualization tasks
-		if (user.runningVisualizationTasks >= 3) return;
+		// If there is already a task for this claim, cancel it
+		if (user.visualizationTasks.containsKey(claim.id)) {
+			user.visualizationTasks.remove(claim.id).cancel();
+		}
 
-		final var visTask = Bukkit.getScheduler().runTaskTimer(
-				Aurora.instance,
-				new ClaimVisualizationTask(claim, player, claim.isAdmin ? Color.RED : (claim.parent == null ? Color.BLUE : Color.GREEN)),
-				0, 5
-		);
-
-		Bukkit.getScheduler().runTaskLater(Aurora.instance, () -> {
-			Bukkit.getScheduler().cancelTask(visTask.getTaskId());
-			user.runningVisualizationTasks -= 1;
-		}, 20 * 20);
-
-		user.runningVisualizationTasks += 1;
+		user.visualizationTasks.put(claim.id, ClaimVisualizationTask.spawn(
+				claim,
+				player,
+				claim.isAdmin ? Color.RED : (claim.parent == null ? Color.BLUE : Color.GREEN),
+				20 * 20
+		));
 	}
 
 	public static boolean isClaimCorner(final @NotNull Claim claim, final @NotNull Location location) {

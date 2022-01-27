@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 package de.lmichaelis.aurora.task;
 
+import de.lmichaelis.aurora.Aurora;
 import de.lmichaelis.aurora.model.Claim;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -13,9 +15,9 @@ public class ClaimVisualizationTask implements Runnable {
 	private final @NotNull Player player;
 
 	private final Claim claim;
-
 	private final double particleDensityX, particleDensityY, particleDensityZ;
 	private final Particle.DustOptions options;
+	private int id;
 
 
 	public ClaimVisualizationTask(final @NotNull Claim claim, final @NotNull Player player, Color color) {
@@ -28,6 +30,13 @@ public class ClaimVisualizationTask implements Runnable {
 		this.particleDensityZ = (claim.maxZ - claim.minZ) / 2.d;
 	}
 
+	public static @NotNull ClaimVisualizationTask spawn(final @NotNull Claim claim, final @NotNull Player player, Color color, final int cancelAfterTicks) {
+		final var task = new ClaimVisualizationTask(claim, player, color);
+		task.id = Bukkit.getScheduler().scheduleSyncRepeatingTask(Aurora.instance, task, 0, 5);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Aurora.instance, task::cancel, cancelAfterTicks);
+		return task;
+	}
+
 	private void drawLineX(double x, double y, double z) {
 		player.spawnParticle(PARTICLE, x, y, z, (int) Math.ceil(particleDensityX / 2), particleDensityX / 2.d, 0, 0, options);
 	}
@@ -36,7 +45,7 @@ public class ClaimVisualizationTask implements Runnable {
 		player.spawnParticle(PARTICLE, x, y, z, (int) Math.max(particleDensityY / 3, 5), 0, particleDensityY / 2.d, 0, options);
 
 		// Don't show highlights for sub-claims.
-		if (claim.parent == null)  {
+		if (claim.parent == null) {
 			player.spawnParticle(PARTICLE, x, this.player.getLocation().getY(), z, 20, 0, 10, 0, options);
 		}
 	}
@@ -72,6 +81,13 @@ public class ClaimVisualizationTask implements Runnable {
 			drawLineX(claim.minX + particleDensityX, playerY, claim.maxZ + 1);
 			drawLineZ(claim.minX, playerY, claim.minZ + particleDensityZ);
 			drawLineZ(claim.maxX + 1, playerY, claim.minZ + particleDensityZ);
+		}
+	}
+
+	public void cancel() {
+		if (id != -1) {
+			Bukkit.getScheduler().cancelTask(id);
+			id = -1;
 		}
 	}
 }

@@ -6,6 +6,8 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import de.lmichaelis.aurora.Aurora;
 import de.lmichaelis.aurora.AuroraUtil;
+import de.lmichaelis.aurora.task.ClaimVisualizationTask;
+import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +38,7 @@ public final class User {
 	public int totalClaimsUsed = 0;
 
 	// Temporary, non-persistent data
-	public int runningVisualizationTasks = 0;
+	public final Int2ObjectArrayMap<ClaimVisualizationTask> visualizationTasks = new Int2ObjectArrayMap<>();
 	public boolean adminMode = false;
 	public Location lastToolLocation = null;
 	public Claim lastSelectedClaim = null;
