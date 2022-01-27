@@ -336,11 +336,16 @@ public final class Interactions {
 			return;
 		}
 
-		final var target = rayTraceResult.getHitPosition().toLocation(player.getWorld());
+		final var target = rayTraceResult.getHitBlock();
+		if (target == null) {
+			player.sendMessage(Aurora.instance.config.messages.tooFarAway);
+			return;
+		}
+
 		if (tool == Aurora.instance.config.claimCreationTool) {
-			onCreationToolUse(event, target);
+			onCreationToolUse(event, target.getLocation());
 		} else {
-			onInvestigationToolUse(event, target);
+			onInvestigationToolUse(event, target.getLocation());
 		}
 	}
 }
