@@ -70,9 +70,9 @@ public final class BlockEventListener extends BaseListener {
 		if (claim == null) return;
 
 		// Rule: If we're 'replacing' a lectern, this means a book was placed into one. This
-		//       action requires only the STEAL permission.
+		//       action requires only the CONTAINERS permission.
 		if (block.getType() == Material.LECTERN && event.getBlockReplacedState().getType() == Material.LECTERN) {
-			if (claim.isAllowed(player, Group.STEAL)) return;
+			if (claim.isAllowed(player, Group.CONTAINERS)) return;
 		}
 
 		// Rule: Inside claims, players need the build permission to place blocks

@@ -98,10 +98,10 @@ public final class PlayerEventListener extends BaseListener {
 			final var subjectType = subject.getType();
 
 			if (subject.getState() instanceof Container) {
-				// Rule: Inventories in claims may only be accessed by players with the STEAL permission
+				// Rule: Inventories in claims may only be accessed by players with the CONTAINERS permission
 				// TODO: Special rule for lecterns: Viewing a book in a lectern should be allowed with
 				//       the ACCESS permission
-				if (!claim.isAllowed(player, Group.STEAL)) {
+				if (!claim.isAllowed(player, Group.CONTAINERS)) {
 					player.sendMessage(plugin.config.messages.noPermission);
 					event.setCancelled(true);
 				}
@@ -137,10 +137,10 @@ public final class PlayerEventListener extends BaseListener {
 		if (claim == null) return;
 
 		// Rule: Interacting with armor stands and item frames as well as chest, hopper and furnace
-		//       minecarts and horses and mules requires the STEAL group. Additionally, picking up
-		//       fishes and axolotls also requires the STEAL group.
+		//       minecarts and horses and mules requires the CONTAINERS group. Additionally, picking up
+		//       fishes and axolotls also requires the CONTAINERS group.
 		if (Predicates.hasEntityContainer(entity) || entity instanceof Fish || entity instanceof Axolotl) {
-			if (claim.isAllowed(player, Group.STEAL)) return;
+			if (claim.isAllowed(player, Group.CONTAINERS)) return;
 		}
 
 		// Rule: Sitting in minecarts and boats requires the ACCESS group
@@ -229,8 +229,8 @@ public final class PlayerEventListener extends BaseListener {
 		// Rule: You can remove books from all lecterns outside of claims
 		if (claim == null) return;
 
-		// Rule: Players remove books from lecterns only if they're in the STEAL group
-		if (claim.isAllowed(player, Group.STEAL)) return;
+		// Rule: Players remove books from lecterns only if they're in the CONTAINERS group
+		if (claim.isAllowed(player, Group.CONTAINERS)) return;
 
 		player.sendMessage(plugin.config.messages.noPermission);
 		player.closeInventory();

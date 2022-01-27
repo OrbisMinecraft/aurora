@@ -212,8 +212,8 @@ public final class EntityEventListener extends BaseListener {
 		// Rule: Allow pushing all vehicles outside of claim
 		if (claim == null) return;
 
-		// Rule: Inside claims, only players with the STEAL group may push vehicles
-		if (claim.isAllowed(player, Group.STEAL)) return;
+		// Rule: Inside claims, only players with the CONTAINERS group may push vehicles
+		if (claim.isAllowed(player, Group.CONTAINERS)) return;
 
 		event.setCancelled(true);
 	}

@@ -64,7 +64,7 @@ public class AuroraGroupListCommand extends AuroraBaseCommand {
 					case OWNER -> player.sendMessage("§aOwner:");
 					case MANAGE -> player.sendMessage("§aManage:");
 					case BUILD -> player.sendMessage("§aBuild:");
-					case STEAL -> player.sendMessage("§aSteal:");
+					case CONTAINERS -> player.sendMessage("§aContainers:");
 					case ACCESS -> player.sendMessage("§aAccess:");
 					case NONE -> {
 					}

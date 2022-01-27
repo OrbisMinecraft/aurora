@@ -9,7 +9,7 @@ public enum Group {
 	OWNER(5),
 	MANAGE(4),
 	BUILD(3),
-	STEAL(2),
+	CONTAINERS(2),
 	ACCESS(1),
 	NONE(0);
 

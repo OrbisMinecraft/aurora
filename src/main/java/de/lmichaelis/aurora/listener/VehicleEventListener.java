@@ -40,8 +40,8 @@ public final class VehicleEventListener extends BaseListener {
 		// Rule: If the event wasn't caused by a player mob-griefing is enabled, allow the damage to go through
 		if (player == null && claim.mobGriefing) return;
 
-		// Rule: If the event was caused by a player, check that they're in the STEAL group
-		if (player != null && claim.isAllowed(player, Group.STEAL)) return;
+		// Rule: If the event was caused by a player, check that they're in the CONTAINERS group
+		if (player != null && claim.isAllowed(player, Group.CONTAINERS)) return;
 
 		if (player != null) player.sendMessage(plugin.config.messages.noPermission);
 		event.setCancelled(true);
