@@ -18,7 +18,7 @@ import java.util.Objects;
 
 public class AuroraSetGroupCommand extends AuroraBaseCommand {
 	private static final List<String> GROUP_NAMES = List.of(
-			"remove",
+			"none",
 			"access",
 			"steal",
 			"build",
@@ -61,7 +61,7 @@ public class AuroraSetGroupCommand extends AuroraBaseCommand {
 			}
 
 			switch (args[2]) {
-				case "remove" -> claim.setGroup(target, Group.NONE);
+				case "none" -> claim.setGroup(target, Group.NONE);
 				case "access" -> claim.setGroup(target, Group.ACCESS);
 				case "steal" -> claim.setGroup(target, Group.STEAL);
 				case "build" -> claim.setGroup(target, Group.BUILD);
