@@ -68,7 +68,8 @@ public final class PlayerEventListener extends BaseListener {
 
 		// Rule: If the player is holding the claim creation or investigation tool, perform
 		//       the required action and cancel the event
-		if (holdType == plugin.config.claimCreationTool || holdType == plugin.config.claimInvestigationTool) {
+		if (holdType == plugin.config.claimCreationTool || holdType == plugin.config.claimInvestigationTool ||
+				holdType == plugin.config.subclaimCreationTool) {
 			Interactions.onAuroraInteract(event);
 			event.setCancelled(true);
 			return;

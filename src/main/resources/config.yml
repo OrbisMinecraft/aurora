@@ -1,6 +1,7 @@
 databaseUri: 'jdbc:h2:./plugins/Aurora/aurora'
 initialClaimBlocks: 1000
 claimCreationTool: 'GOLDEN_SHOVEL'
+subclaimCreationTool: 'GOLDEN_HOE'
 claimInvestigationTool: 'STICK'
 accrueClaimBlockEnabled: true
 accrueClaimBlocksPerHour: 100
@@ -28,7 +29,7 @@ messages:
   cannotSetOwnGroup: "§cYou can't change your own group."
   tooManyClaims: "§cYou can't create any more claims."
   noNestedSubclaims: "§cYou can't create nested subclaims."
-  sublaimsRequireMode: "§cTo create subclaims, switch to subdivision mode."
+  sublaimsRequireMode: "§cTo create subclaims, please use a %s."
 
   claimListHeader: "These are your claims:"
   claimListEntry: "§3- %s at (%d, %d); %d blocks"

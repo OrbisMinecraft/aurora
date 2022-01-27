@@ -27,7 +27,7 @@ public final class MessagesConfig {
 	public String cannotSetOwnGroup = "§cYou can't change your own group.";
 	public String tooManyClaims = "§cYou can't create any more claims.";
 	public String noNestedSubclaims = "§cYou can't create nested subclaims.";
-	public String sublaimsRequireMode = "§cTo create subclaims, switch to subdivision mode.";
+	public String sublaimsRequireMode = "§cTo create subclaims, please use a %s.";
 
 	public String claimListHeader = "These are your claims:";
 	public String claimListEntry = "§3- %s at (%d, %d); %d blocks";

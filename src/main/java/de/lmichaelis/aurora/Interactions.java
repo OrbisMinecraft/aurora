@@ -32,6 +32,7 @@ public final class Interactions {
 		final var user = Objects.requireNonNull(User.fromMetadata(player));
 		final var totalClaimsLimit = Aurora.instance.config.totalClaimsLimit;
 		final var isAdminClaiming = user.adminMode && player.hasPermission("aurora.admin.claims");
+		final var subdivideMode = event.getItem().getType() == Aurora.instance.config.subclaimCreationTool;
 
 		if (!player.hasPermission("aurora.claims")) {
 			// The player is not allowed to create or modify claims
@@ -42,7 +43,7 @@ public final class Interactions {
 		if (claim == null || (user.lastSelectedClaim != null && claim.id == user.lastSelectedClaim.id)) {
 			// The player is creating a new claim or setting the second corner for a claim resize
 			if (user.lastSelectedClaim != null) {
-				if (user.subdivideMode) {
+				if (subdivideMode && !isAdminClaiming) {
 					if (claim == null) {
 						// The other corner of a subdivision claim is outside the main claim!
 						player.sendMessage(Aurora.instance.config.messages.invalidSubclaimLocation);
@@ -82,7 +83,7 @@ public final class Interactions {
 				user.lastSelectedClaim = claim;
 				user.lastToolLocation = target;
 				player.sendMessage(Aurora.instance.config.messages.resizingClaim);
-			} else if (user.subdivideMode && claim.parent == null) {
+			} else if (subdivideMode && claim.parent == null) {
 				// The player is creating a new sub-claim
 				user.lastToolLocation = target;
 				user.lastSelectedClaim = claim;
@@ -91,8 +92,10 @@ public final class Interactions {
 				));
 			} else {
 				// The player is not in subdivision mode, or they tried to create a nested sub-claim
-				player.sendMessage(user.subdivideMode ? Aurora.instance.config.messages.noNestedSubclaims
-						: Aurora.instance.config.messages.sublaimsRequireMode);
+				player.sendMessage(subdivideMode ? Aurora.instance.config.messages.noNestedSubclaims
+						: Aurora.instance.config.messages.sublaimsRequireMode.formatted(
+								Aurora.instance.config.subclaimCreationTool
+				));
 			}
 		} else {
 			// The player is clicking into an already existing claim and no action can be performed with it
@@ -342,7 +345,7 @@ public final class Interactions {
 			return;
 		}
 
-		if (tool == Aurora.instance.config.claimCreationTool) {
+		if (tool == Aurora.instance.config.claimCreationTool || tool == Aurora.instance.config.subclaimCreationTool) {
 			onCreationToolUse(event, target.getLocation());
 		} else {
 			onInvestigationToolUse(event, target.getLocation());

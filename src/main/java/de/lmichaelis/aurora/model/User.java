@@ -38,7 +38,6 @@ public final class User {
 	// Temporary, non-persistent data
 	public int runningVisualizationTasks = 0;
 	public boolean adminMode = false;
-	public boolean subdivideMode = false;
 	public Location lastToolLocation = null;
 	public Claim lastSelectedClaim = null;
 

@@ -18,6 +18,7 @@ public final class AuroraConfig {
 	public String databaseUri = "jdbc:h2:mem:";
 	public int initialClaimBlocks = 1000;
 	public Material claimCreationTool = Material.GOLDEN_SHOVEL;
+	public Material subclaimCreationTool = Material.GOLDEN_HOE;
 	public Material claimInvestigationTool = Material.STICK;
 	public MessagesConfig messages = new MessagesConfig();
 	public boolean accrueClaimBlockEnabled = true;
