@@ -276,6 +276,14 @@ public final class Claim {
 	 */
 	public Group getGroup(final @NotNull OfflinePlayer player) {
 		if (Objects.equals(player.getUniqueId(), this.owner)) return Group.OWNER;
+		if (this.userGroups == null) {
+			// Oh god, this is inefficient
+			try {
+				Aurora.db.claims.refresh(this);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 
 		for (final var group : this.userGroups) {
 			if (group.player.equals(player.getUniqueId())) {
