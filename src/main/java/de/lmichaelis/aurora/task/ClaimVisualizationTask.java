@@ -14,7 +14,7 @@ public class ClaimVisualizationTask implements Runnable {
 
 	private final Claim claim;
 
-	private final int particleDensityX, particleDensityY, particleDensityZ;
+	private final double particleDensityX, particleDensityY, particleDensityZ;
 	private final Particle.DustOptions options;
 
 
@@ -23,17 +23,17 @@ public class ClaimVisualizationTask implements Runnable {
 		this.claim = claim;
 		this.options = new Particle.DustOptions(color, 3);
 
-		this.particleDensityX = (claim.maxX - claim.minX) / 2;
-		this.particleDensityY = (claim.maxY - claim.minY) / 2;
-		this.particleDensityZ = (claim.maxZ - claim.minZ) / 2;
+		this.particleDensityX = (claim.maxX - claim.minX) / 2.d;
+		this.particleDensityY = (claim.maxY - claim.minY) / 2.d;
+		this.particleDensityZ = (claim.maxZ - claim.minZ) / 2.d;
 	}
 
-	private void drawLineX(int x, int y, int z) {
-		player.spawnParticle(PARTICLE, x, y, z, Math.max(particleDensityX / 2, 5), particleDensityX / 2., 0, 0, options);
+	private void drawLineX(double x, double y, double z) {
+		player.spawnParticle(PARTICLE, x, y, z, (int) Math.ceil(particleDensityX / 2), particleDensityX / 2.d, 0, 0, options);
 	}
 
-	private void drawLineY(int x, int y, int z) {
-		player.spawnParticle(PARTICLE, x, y, z, Math.max(particleDensityY / 3, 5), 0, Math.max(particleDensityY / 3.f, 1), 0, options);
+	private void drawLineY(double x, double y, double z) {
+		player.spawnParticle(PARTICLE, x, y, z, (int) Math.max(particleDensityY / 3, 5), 0, particleDensityY / 2.d, 0, options);
 
 		// Don't show highlights for sub-claims.
 		if (claim.parent == null)  {
@@ -41,17 +41,17 @@ public class ClaimVisualizationTask implements Runnable {
 		}
 	}
 
-	private void drawLineZ(int x, int y, int z) {
-		player.spawnParticle(PARTICLE, x, y, z, Math.max(particleDensityZ / 2, 5), 0, 0, particleDensityZ / 3.f, options);
+	private void drawLineZ(double x, double y, double z) {
+		player.spawnParticle(PARTICLE, x, y, z, (int) Math.ceil(particleDensityZ / 2), 0, 0, particleDensityZ / 2.d, options);
 	}
 
 	@Override
 	public void run() {
 		// Draw the corners
-		drawLineY(claim.minX, claim.minY + particleDensityY, claim.minZ);
-		drawLineY(claim.minX, claim.minY + particleDensityY, claim.maxZ + 1);
-		drawLineY(claim.maxX + 1, claim.minY + particleDensityY, claim.minZ);
-		drawLineY(claim.maxX + 1, claim.minY + particleDensityY, claim.maxZ + 1);
+		drawLineY(claim.minX, claim.minY + particleDensityY + 0.5, claim.minZ);
+		drawLineY(claim.minX, claim.minY + particleDensityY + 0.5, claim.maxZ + 1);
+		drawLineY(claim.maxX + 1, claim.minY + particleDensityY + 0.5, claim.minZ);
+		drawLineY(claim.maxX + 1, claim.minY + particleDensityY + 0.5, claim.maxZ + 1);
 
 		// Draw the bottom rectangle
 		drawLineX(claim.minX + particleDensityX, claim.minY, claim.minZ);
@@ -60,10 +60,10 @@ public class ClaimVisualizationTask implements Runnable {
 		drawLineZ(claim.maxX + 1, claim.minY, claim.minZ + particleDensityZ);
 
 		// Draw the top rectangle
-		drawLineX(claim.minX + particleDensityX, claim.maxY, claim.minZ);
-		drawLineX(claim.minX + particleDensityX, claim.maxY, claim.maxZ + 1);
-		drawLineZ(claim.minX, claim.maxY, claim.minZ + particleDensityZ);
-		drawLineZ(claim.maxX + 1, claim.maxY, claim.minZ + particleDensityZ);
+		drawLineX(claim.minX + particleDensityX, claim.maxY + 1, claim.minZ);
+		drawLineX(claim.minX + particleDensityX, claim.maxY + 1, claim.maxZ + 1);
+		drawLineZ(claim.minX, claim.maxY + 1, claim.minZ + particleDensityZ);
+		drawLineZ(claim.maxX + 1, claim.maxY + 1, claim.minZ + particleDensityZ);
 
 		// Draw a line at the player's head position only if we're not inspecting a subclaim
 		if (claim.parent == null) {
