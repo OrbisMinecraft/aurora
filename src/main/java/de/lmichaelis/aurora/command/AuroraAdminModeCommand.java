@@ -48,6 +48,9 @@ public class AuroraAdminModeCommand extends AuroraBaseCommand {
 			ADMIN_MODE_BOSS_BAR.addPlayer(player);
 		}
 
+		// Reset the current selection
+		user.lastSelectedClaim = null;
+		user.lastToolLocation = null;
 		return true;
 	}
 
