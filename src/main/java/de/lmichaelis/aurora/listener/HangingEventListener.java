@@ -65,8 +65,6 @@ public final class HangingEventListener extends BaseListener {
 		// TODO: Can `player` actually be null?
 		assert player != null;
 
-		// TODO: We can't detect if a player is removing an item from an item frame yet.
-		//       Maybe this is handled by another listener but I don't currently see how.
 		// Rule: Only players with the BUILD group can place hanging entities inside claims
 		if (claim.isAllowed(player, Group.BUILD)) return;
 
