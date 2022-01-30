@@ -49,8 +49,7 @@ public class AuroraAdminModeCommand extends AuroraBaseCommand {
 		}
 
 		// Reset the current selection
-		user.lastSelectedClaim = null;
-		user.lastToolLocation = null;
+		user.currentInteraction = null;
 		return true;
 	}
 

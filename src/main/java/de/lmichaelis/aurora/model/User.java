@@ -6,9 +6,9 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import de.lmichaelis.aurora.Aurora;
 import de.lmichaelis.aurora.AuroraUtil;
+import de.lmichaelis.aurora.interactions.InteractionHandler;
 import de.lmichaelis.aurora.task.ClaimVisualizationTask;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +23,10 @@ import java.util.UUID;
 @DatabaseTable(tableName = "users")
 public final class User {
 	public static final String METADATA_KEY = "aurora.user";
+
 	// TODO: User params per world!
+	// Temporary, non-persistent data
+	public final Int2ObjectArrayMap<ClaimVisualizationTask> visualizationTasks = new Int2ObjectArrayMap<>();
 
 	@DatabaseField(id = true)
 	public UUID id;
@@ -37,11 +40,8 @@ public final class User {
 	@DatabaseField(canBeNull = false)
 	public int totalClaimsUsed = 0;
 
-	// Temporary, non-persistent data
-	public final Int2ObjectArrayMap<ClaimVisualizationTask> visualizationTasks = new Int2ObjectArrayMap<>();
 	public boolean adminMode = false;
-	public Location lastToolLocation = null;
-	public Claim lastSelectedClaim = null;
+	public InteractionHandler currentInteraction = null;
 
 	public User(final UUID id, int totalClaims) {
 		this.id = id;
