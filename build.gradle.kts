@@ -1,8 +1,13 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar;
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
+import dev.s7a.gradle.minecraft.server.tasks.LaunchMinecraftServerTask
+import dev.s7a.gradle.minecraft.server.tasks.LaunchMinecraftServerTask.JarUrl
 
 plugins {
-    id("com.github.johnrengelman.shadow") version "7.1.0"
     id("java")
+
+    id("com.github.johnrengelman.shadow") version "7.1.0"
+    id("dev.s7a.gradle.minecraft.server") version "2.0.0"
 }
 
 val gitCommitHash = ProcessBuilder("git", "rev-parse", "--verify", "--short", "HEAD")
@@ -71,4 +76,18 @@ tasks.withType<ProcessResources> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+task<LaunchMinecraftServerTask>("launchServer") {
+    dependsOn("shadowJar")
+
+    doFirst {
+        copy {
+            from(buildDir.resolve("libs/aurora-${version}.jar"))
+            into(buildDir.resolve("MinecraftServer/plugins"))
+        }
+    }
+
+    jarUrl.set(JarUrl.Paper("1.18.2"))
+    agreeEula.set(true)
 }
