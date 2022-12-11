@@ -56,7 +56,7 @@ public class AuroraUnclaimCommand extends AuroraBaseCommand {
 				ownerUser = Objects.requireNonNull(User.get(claim.owner));
 			}
 
-			if (!claim.isAdmin) {
+			if (!claim.isAdmin && claim.parent == null) {
 				ownerUser.refresh();
 				ownerUser.usedClaimBlocks -= claim.size();
 				ownerUser.totalClaimsUsed -= 1;
