@@ -132,6 +132,11 @@ public final class Interactions {
 			user.visualizationTasks.remove(claim.id).cancel();
 		}
 
+		// If the claim in question is a subclaim, also visualize the corners of the parent claim.
+		if (claim.parent != null) {
+			showClaimBoundaries(player, claim.parent);
+		}
+
 		user.visualizationTasks.put(claim.id, ClaimVisualizationTask.spawn(
 				claim,
 				player,
