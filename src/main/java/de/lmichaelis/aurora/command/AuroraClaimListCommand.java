@@ -63,7 +63,7 @@ public class AuroraClaimListCommand extends AuroraBaseCommand {
 							claim.minZ,
 							claim.size()
 					));
-				} else {
+				} else if (claim.parent == null) {
 					player.sendMessage(plugin.config.messages.claimListEntry.formatted(
 							claim.name,
 							claim.minX,
