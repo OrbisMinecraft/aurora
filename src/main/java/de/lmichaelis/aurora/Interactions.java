@@ -62,6 +62,10 @@ public final class Interactions {
 
 			// the user is creating a new top-level claim
 			user.currentInteraction = new ClaimCreateHandler(target, user, null);
+
+			player.sendMessage(Aurora.instance.config.messages.claimCornerSet.formatted(
+					target.getBlockX(), target.getBlockY(), target.getBlockZ()
+			));
 		} else if (claim.isAllowed(player, Group.OWNER)) {
 			if (isClaimCorner(claim, target)) {
 				if (claim.parent != null) {
