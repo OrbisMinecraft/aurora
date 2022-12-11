@@ -41,8 +41,10 @@ public class ClaimVisualizationTask implements Runnable {
 		final var location = new Location(player.getWorld(), x1, y1, z1);
 
 		for (int step = 0; step < stepCount + 1; step++) {
-			if (location.distanceSquared(player.getLocation()) > 100 * 100) break;
-			player.spawnParticle(PARTICLE, location, 1, 0, 0, 0, options);
+			if (location.distanceSquared(player.getLocation()) <= 100 * 100) {
+				player.spawnParticle(PARTICLE, location, 1, 0, 0, 0, options);
+			}
+
 			location.add(stepSizeX, stepSizeY, stepSizeZ);
 		}
 	}
